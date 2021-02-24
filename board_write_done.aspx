@@ -14,6 +14,14 @@ void Page_Load()
   Response.Write("내용 : " + content + "<hr>");
   Response.Write("비번 : " + password + "<hr>");
 
-}
+  // 파일저장부분
+  HttpPostedFile files = Request.Files["uploadfile"];
 
+  string target_path = Server.MapPath("\\");   // "c:\\home"
+  string file_name = files.FileName;
+  files.SaveAs(target_path + @"\" + file_name); // c:\home\파일명.
+
+  Response.Write("업로드파일 : " + file_name + "(사이즈 : " + files.ContentLength + " bytes) <hr>");
+  
+}
 </script>

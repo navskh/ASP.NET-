@@ -4,7 +4,7 @@
 // 소스코드의 시작
 void Page_Load()  // 자동 실행 메서드
   {
-    string count_path = "c:\\home\\count3.txt";
+    string count_path = "c:\\home\\home\\count3.txt";
     int new_count = 1;
     if (File.Exists(count_path) == false) 
       {

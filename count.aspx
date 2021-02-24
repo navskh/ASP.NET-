@@ -6,6 +6,7 @@ void Page_Load()
 {
   string count_path = "c:\\home\\count.txt";
   StreamWriter sw = File.CreateText(count_path);
+  sw.Close();
 }
 
 

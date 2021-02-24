@@ -50,10 +50,204 @@ https://guyv.tistory.com/category/%E2%93%9Frogramming/asp.net%20%EA%B2%8C%EC%8B%
   - get 메서드를 사용해서 전송하면 어떤 값으로 전송되는지 주소로 구분이 가능하다.<a>태그의 링크형태로 값을 전송할 수도 있다.
   - post 메서드를 사용해서 전송하면 주소에 붙여서 전송하지 않고 내용으로 전달한다. 보안성이 필요할 때 사용 (파일전송도)
   - 게시판의 경우 글내용이 있으므로 get으로 보내선 안되고 post로 보내야 한다.
- 
+  
 8. request와 response.
   -request의 경우
     Request.Form["name명"];            // 1. POST받기
     Request.QueryString["name명"];     // 2. GET받기
     Request["name명"];                 // 3. GET/POST 구분없이 받기
+
+(21.02.20)
+  - 일단 오늘은 상대방의 노트북에서 왜 접속이 안될까를 생각해보려고 한다.
+  같은 공유기를 쓰는상태에선 상대방 노트북에서 접속이 가능하다.
+  그러나 만약 핸드폰 LTE를 써서 접속을 시도할 시 불가능하다.
+
+<13장~(15) Extra Part>
+(21.02.21)
+  1.File 제어 
+  <input type="file" size="15" name="uploadfile"> <form> 태그에 enctype 이라는 속성 추가
+  인코딩(변환)을 어떻게 하는지 추가하는 것임 "multipart/form-data"로 지정
+  
+  [웹하드 기능을 하는 웹페이지 만들어 보기]
+    1) 파일 업로드
+    2) 파일 삭제
+    3) 폴더 생성
+    4) 폴더 삭제
+
+  위 기능은 일단 나중에 server와 html 간의 통신 때 쓰는 기능이 필요하기에 나중에 하는 걸로..
+  나중에 게시판 만들 때 해보고 싶은 리스트로 만들어 두자.
+
+  2. 컨트롤의 개념
+  asp.net 에서는 거의 대부분의 태그들(<table>,<form><input type=...> 등..)을 모두 프로그래밍 방식으로 사용할 수 있다
+  - 기존의 폼컨트롤 -> asp에서 사용하는 컨트롤로 변경한다. form 태그, input 태그, 서버단에서 사용하는 방식이 달라진다.
+    1)  기존 사용법
+        <form method="post" action="control1.aspx"> 
+        <input type="text" name="userid">
+
+      server:
+      Response.Write("아이디: " + Request["userid"] + "<br>");
+
+    2) 변형문
+        <form runat="server">
+        <input type="text" id="userid" runat="server">
+
+      server:
+      Response.Write("아이디: " + userid.Value + "<br>");
+
+    1),2) 두개 중 하나를 써도 되는데 "2)의 경우" 모두 post 방식이다. (method는생략)
+    name 대신 id를 사용 form 태그에는 runat="server"를 사용  
+    onserverclick="" (event기반의 프로그래밍) - 버튼이나, 체크박스, 텍스트 박스 등에 걸 수 있음
+
+    3) void Login_Proc(object o, EventArgs e) 메서드를 사용했음
+    object o : System.Object (닷넷에서의 가장 최고 클래스) 위의 코드의 경우 버튼
+    EventArgs?  이벤트의 argument 위의 경우 `클릭`
+    위의 메서드에서 두개의 정보를 받는다.
+    (1)어떤 객체로부터 발생했고, 이벤트 발생시에 (2)어떤 정보와 함께 실려서 오는지
+
+    4) Request["userid"] --> userid.Value로 바뀜
+    userid가 인스턴스화된 객체가 된 것임. 
+
+    5) 닷넷 서버컨트롤은 두가지가 있음
+    - WebForm 컨트롤
+    - HTMLForm 컨트롤 : 단순히 태그에 id와 runat="server"만 붙여주면 사용할 수 있음. 
+
+  3. 한줄 메모장 만들기
+    입력 : [이름], [내용], [버튼]
+    출력 : [이름], [내용], [시간]
+
+    다음과 같은 문제점이 있었음
+    1) 첫번째 문제, HTML 영역 아래에 ASP 코딩한부분을 출력하고 싶으면 어떻게 해야하는가
+    아직 해결 안됨
+
+    2) 두번째 문제, 저장할 때 writeline 으로 txt 파일을 저장하려고 하는데, 줄바꿈 처리를 어떻게 해야하는가
+    WriteLine을 할 시 알아서 줄바꿈이 되었음. 마지막에 줄바꿈 문자가 같이 들어감.
+
+    3) 세번째 문제, 줄바꿈 처리 후 이름/내용/시간 순으로 출력해줘야하는데 구분자(/#/) 단위로 어떻게 끊을 수 있는가
+    string.split("구분자") 함수를 사용하여 해결.
+
+  (21.02.23)
+  <15장~>
+  1. 서버컨트롤이란 태그에 runat="server"를 붙여줌으로써 사용할 수 있다.
+  asp.net 에서 html 의 tag를 구현할 수 있게 해준다.
+
+  2. asp.net 의 모든 컨트롤에는 속성을 제어하기 위한 컬렉션(Collection)이 존재한다. Attributes
+  대표적인 Attributes 컬렛션
+  [메서드]
+  Add(string key, string value) : key라는 이름으로 value 값으로 추가
+  Clear() : 모두 삭제
+  Remove(string key) : 해당 key이름의 컬렉션 삭제
+
+  [속성]
+  Count : 해당 컬렉션의 갯수
+  Item : 컬렉션의 특성 값
+  
+  [사용예]
+  BODY_TAG.Attributes.Add("bgcolor", "yellow");
+
+  [컨트롤 생성, 추가]
+  1) <form>을 만들기 위해 HtmlForm 클래스를 사용한다.
+  2) <form> 에 '텍스트박스'와 '버튼'을 하나 넣는다.
+  3) 텍스트박스의 id 는 user_name(ID="user_name") 으로 준다.
+  4) 버튼에 나오는 텍스트는 "인사하기"라고 준다. (Value="인사하기")
+  5) 버튼을 클릭시 메서드를 호출하기 위해 이벤트(button_click)를 걸어준다. (이벤트? 처음보는 내용)
+  6) 그리고 출력을 위해 HtmlGenericControl 서버컨트롤을 추가한다.(ID="output")
+  7) <body>태그에 서버컨트롤 form을 추가한다. 
+  8) 추가된 form에 텍스트박스, 버튼 순으로 넣어준다.
+
+  [버튼클릭시 처리]
+  9) 버튼이 클릭됐을 때 호출되는 이벤트 메서드(button_click)를 만든다.
+  10) 출력되는 컨트롤인 output 을 FindControl("id명") 메서드로 찾아준다.
+  11) 텍스트박스 컨트롤인 user_name 을 FindControl("id명") 메서드로 찾아준다.
+  12) 텍스트박스에 값이 없으면 빨간색으로 output 에 "이름을 입력하세요!"라고 출력한다. 
+  13) 텍스트박스에 값이 있으면 "Hello! (입력값)" 의 형식으로 output 에 출력해준다
+
+    *) 클래스 생성자
+    클래스명 사용할_이름 = new 클래스명();
+
+    *) 컨트롤을 넣는 방법
+    BODY_TAG.Controls.Add(컨트롤 인스턴스명);
+
+    *) 이벤트 연결
+    클래스명.이벤트명 += new EventHandler(메서드명);
+    (이벤트를 지정시 +=, 이벤트 해제시 -= 를 사용)
+
+    *)HtmlControl 의 특징
+    1. 태그(<tag>)에 runat="server"만 붙여주면 해당 태그에 맞는 HtmlControl(서버컨트롤)로 변신하게 됨.
+    2. 일반적으로 사용하는 대부분의 태그뿐만 아니라, 모든 <form>태그를 서버컨트롤로 이용할 수 있기 때문에, `프로그래밍 방식`으로 태그를 제어하거나 값을 읽을 수 있음. 
+    (프로그래밍 방식이라 함은 그냥 태그를 사용하는 것이 아니라 입력에 맞게끔 출력을 내보내주는 동적 프로그램을 의미)
+
+  3. 웹폼 (웹컨트롤)의 특징
+  <ASP:DropDownList id="넘어갈 key" runat="server">
+      <ASP:ListItem value="넘어갈 value">보여지는 내용</ASP:ListItem>
+      <ASP:ListItem value="넘어갈 value">보여지는 내용</ASP:ListItem>
+        ....
+  </ASP:DropDownList>
+  위와 같이 HTML 태그와 비슷하게 사용하게 된다. 넘어갈 key와 value를 지정해줌.
+  그런데 꼭 <form runat="server">...</form> 태그로 감싸줘야 사용할 수 있다.
+
+  *) 렌더링 이란 서버컨트롤이 결과물로 변형되는 것.
+  Label 웹폼을 사용하여 출력할 수 있다.
+  Label 웹폼은 입력받는 형식의 컨트롤은 아니기에 <form>으로 감싸줄 필요 없음
+
+  웹폼은 임의로 지정한 커스텀으로 태그의 속성을 지정해 줄 수 있다. ex) <font effect="mine"> 에서 effect와 같은 속성
+  또한 웹폼은 SqlDataSource 및 ObjectDataSource 클래스와 같이 aspx에 태그로 변경되지는 않지만 데이터(Data)작업을 위한 클래스도 포함되어 있다.  ex) 달력기능을 그냥 쉽게 만들 수 있다. <ASP:Calendar>
+
+  <ASP:Calendar>의 경우 디자인 지정도 맘대로 할 수 있음
+
+  4. 웹폼의 사용법
+    - 웹폼 컨트롤은 <ASP:웹폼클래스명 runat="server" /> 형식으로 디자인 단에  만들 수 있다.
+    - 웹폼 컨트롤은 클래스이기 때문에, 프로그래밍 코드로 인스턴스 화를 한 후 컨트롤을 추가시킬 수도 있다. (동적으로 만들 수 있다)
+    - 디자인 단이든 코드 단이든 웹폼의 기능을 동일하게 속성 값으로 지정할 수 있다.
+
+  <ASP:Calendar>의 디자인 변경
+    1) 달력의 길이와 높이를 적당하게 조절
+      cal1.Width = 500;
+      cal1.Height = 500;
+    calendar에 지정한 id인 cal1의 구조체 변수 중 하나인 Width와 Height를 받아 크기 설정 가능 
+
+    2) 달력에 구분선을 주어 일반 달력처럼 보이게
+      cal1.ShowGridLines = true;
+      캘린더 클래스의 속성 값인 ShowGridLines 값이 true가 되면 모눈선 그려짐 (false일 땐 안그려짐)
+
+    3) 날짜의 첫 줄인 "일 월 화 수 목 금 토" 항목에 배경색 넣기
+      일단 색상과 연관하여 <%@ Import Namespace = "System.Drawing" %> 를 문서 상단에 추가
+      cal1.DayHeaderStyle.BackColor = System.Drawing.Color.Yellow;
+      를 사용하여 요일 색상을 노란색으로 변경
+    
+    위1),2),3) 항목을 아래와 같이 사용가능하다.
+    <ASP:Calendar id="cal1" runat="server" Width="500" Height="500" ShowGridLines="true">
+    <DayHeaderStyle BackColor="yellow"></DayHeaderStyle>
+    </ASP:Calendar>
+
+  5. 웹폼 중 하나인 TreeView 컨트롤
+    트리뷰의 형태는 다음과 같다.
+    <ASP:TreeView id="tree1" ExpandDepth="0" runat="server">
+    <Nodes>
+    <asp:TreeNode Text="하위메뉴열기" SelectAction="Expand"> 
+    <asp:TreeNode Text="메뉴1" />
+    <asp:TreeNode Text="메뉴2" />  
+          <asp:TreeNode Text="메뉴3" SelectAction="Expand">
+              <asp:TreeNode Text="메뉴 3-1" />  
+              <asp:TreeNode Text="메뉴 3-2" />
+          </asp:TreeNode>  
+    </asp:TreeNode>
+    </Nodes>
+    </ASP:TreeView>
+  이와 같이 사용 가능
+
+  6. 이벤트 포스트 백 개념. 
+    클릭 이벤트
+    OnClick="호출할_메서드"
+    OnCommand="호출할_메서드"
+
+    - 서버 컨트롤을 이용하면 각각의 컨트롤은 해당 이벤트 처리 후에도 계속해서 해당 상태를 유지하는 특징이 있음
+    ViewState (뷰스테이트)
+    <input type="hidden" name="__VIEWSTATE" id="__VIEWSTATE" value="/wEPDwUKLTM1OTA4MjdG9uLCBob3dlgQ1c6kbnHCj7SXQjEO5/4IM=" />
+    위에서 이 View State를 계속해서 보내며 유지한다. 이런 행위를 포스트 백이라고 부름
+    포스트 백은 IsPostBack 이라는 Bool 자료형으로 체크할 수 있음
+    
+
+
+
+
 

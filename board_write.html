@@ -8,7 +8,7 @@
 
 <b>게시판 글쓰기 페이지</b>
 <hr>
-<form method="post" action="http://10.1.1.102/board_write_done.aspx">
+<form method="post" action="http://127.0.0.1/board_write_done.aspx" enctype="multipart/form-data">
   <b>이름</b>
   <input type="text" size="15" name="name">
   <hr>
@@ -21,6 +21,9 @@
   <hr>
   <b>비밀번호</b>
   <input type="password" size="15" name="password">
+  <hr>
+  <b>첨부파일</b>
+  <input type="file" size="15" name="uploadfile">
   <hr>
   <input type="submit" value="작성완료">
   <input type="button" value="취소">
