@@ -1,0 +1,63 @@
+
+<13장~(15) Extra Part>
+(21.02.21)
+  1.File 제어 
+  <input type="file" size="15" name="uploadfile"> <form> 태그에 enctype 이라는 속성 추가
+  인코딩(변환)을 어떻게 하는지 추가하는 것임 "multipart/form-data"로 지정
+  
+  [웹하드 기능을 하는 웹페이지 만들어 보기]
+    1) 파일 업로드
+    2) 파일 삭제
+    3) 폴더 생성
+    4) 폴더 삭제
+
+  위 기능은 일단 나중에 server와 html 간의 통신 때 쓰는 기능이 필요하기에 나중에 하는 걸로..
+  나중에 게시판 만들 때 해보고 싶은 리스트로 만들어 두자.
+
+  2. 컨트롤의 개념
+  asp.net 에서는 거의 대부분의 태그들(<table>,<form><input type=...> 등..)을 모두 프로그래밍 방식으로 사용할 수 있다
+  - 기존의 폼컨트롤 -> asp에서 사용하는 컨트롤로 변경한다. form 태그, input 태그, 서버단에서 사용하는 방식이 달라진다.
+    1)  기존 사용법
+        <form method="post" action="control1.aspx"> 
+        <input type="text" name="userid">
+
+      server:
+      Response.Write("아이디: " + Request["userid"] + "<br>");
+
+    2) 변형문
+        <form runat="server">
+        <input type="text" id="userid" runat="server">
+
+      server:
+      Response.Write("아이디: " + userid.Value + "<br>");
+
+    1),2) 두개 중 하나를 써도 되는데 "2)의 경우" 모두 post 방식이다. (method는생략)
+    name 대신 id를 사용 form 태그에는 runat="server"를 사용  
+    onserverclick="" (event기반의 프로그래밍) - 버튼이나, 체크박스, 텍스트 박스 등에 걸 수 있음
+
+    3) void Login_Proc(object o, EventArgs e) 메서드를 사용했음
+    object o : System.Object (닷넷에서의 가장 최고 클래스) 위의 코드의 경우 버튼
+    EventArgs?  이벤트의 argument 위의 경우 `클릭`
+    위의 메서드에서 두개의 정보를 받는다.
+    (1)어떤 객체로부터 발생했고, 이벤트 발생시에 (2)어떤 정보와 함께 실려서 오는지
+
+    4) Request["userid"] --> userid.Value로 바뀜
+    userid가 인스턴스화된 객체가 된 것임. 
+
+    5) 닷넷 서버컨트롤은 두가지가 있음
+    - WebForm 컨트롤
+    - HTMLForm 컨트롤 : 단순히 태그에 id와 runat="server"만 붙여주면 사용할 수 있음. 
+
+  3. 한줄 메모장 만들기
+    입력 : [이름], [내용], [버튼]
+    출력 : [이름], [내용], [시간]
+
+    다음과 같은 문제점이 있었음
+    1) 첫번째 문제, HTML 영역 아래에 ASP 코딩한부분을 출력하고 싶으면 어떻게 해야하는가
+    아직 해결 안됨
+
+    2) 두번째 문제, 저장할 때 writeline 으로 txt 파일을 저장하려고 하는데, 줄바꿈 처리를 어떻게 해야하는가
+    WriteLine을 할 시 알아서 줄바꿈이 되었음. 마지막에 줄바꿈 문자가 같이 들어감.
+
+    3) 세번째 문제, 줄바꿈 처리 후 이름/내용/시간 순으로 출력해줘야하는데 구분자(/#/) 단위로 어떻게 끊을 수 있는가
+    string.split("구분자") 함수를 사용하여 해결.

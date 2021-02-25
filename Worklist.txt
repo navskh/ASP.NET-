@@ -247,7 +247,204 @@ https://guyv.tistory.com/category/%E2%93%9Frogramming/asp.net%20%EA%B2%8C%EC%8B%
     포스트 백은 IsPostBack 이라는 Bool 자료형으로 체크할 수 있음
     
 
+    (21.02.24)
+    <23장~>
+      1. DB와 ASP.NET간에 연결
+        - DB 연동을 위해서는 System.Data namespace를 참조해야 함.
+        - SQL Server에 연동하기 위해서는 System.Data.SqlClient namespace를 참조해야함
+    
+        string str_conn = "server=NAVSKH;user id=sa;password=1121;database=aspnet";
+        SqlConnection conn = new SqlConnection(str_conn);
+        conn.Open();
+        
+        이렇게 하면 연결 됨.
+    
+      2. 쿼리문의 사용 및 출력
+        1) 결과가 없는 쿼리문을 실행할 때 : ExecuteNonQuery 메서드 사용
+          string QUERY ="INSERT INTO member_table VALUES('aspnet', '1234', '닷넷초보', getdate())";
+          SqlCommand cmd = new SqlCommand(QUERY, conn);
+          cmd.ExecuteNonQuery();
+    
+        2) 결과가 있는 쿼리문을 실행할 때 : ExecuteScalar, ExecuteReader 메서드 사용
+          - ExcuteScalar 값은 결과가 여러개여도 첫번째 값 하나만 반환 함.
+          string QUERY ="SELECT user_name FROM member_table WHERE user_id='aspnet'";
+          SqlCommand cmd = new SqlCommand(QUERY, conn);
+          object result = cmd.ExecuteScalar();
+          Response.Write(result);
+    
+          - ExcuteReader의 경우는 여러개의 값을 받을 수 있음
+    
+        3) DataAdapter로 접근하여 db를 불러올 수 있다.
+          SqlDataAdapter da = new SqlDataAdapter(QUERY, conn);
+          DataSet ds = new DataSet();
+          da.Fill(ds); 
+          위와 같이 사용하며 ds라는 DataSet에 해당 sql의 결과를 저장하여 한 셀씩을 사용할 수 있다.
+    
+        4) DataGrid, DataBind
+          dg1.DataSource = ds.Tables[0];
+          dg1.DataBind();
+          <form runat="server">
+          <ASP:DataGrid id="dg1" runat="server" />
+          </form>
+          DataGrid 서버 컨트롤을 만들어서 DataBind 메서드 호출하면 그 결과를 표의 형태로 그대로 가져와서 출력해줄 수 있다.
+          DataGrid와 같은 웹폼이 많이 있음
+    
+      3. Repeater
+        데이터 컨트롤인데 형식이 지정되어 있지 않아 유연한 사용이 가능
+        사용법) 웹폼 Repeater(id는 rpt1)를 만들고 DataBind해서 사용할 수 있다.
+          rpt1.DataSource = ds.Tables[0];
+          rpt1.DataBind();
+      
+          <ASP:Repeater id="rpt1" runat="server">
+          
+          <ItemTemplate>
+            <%# Eval("user_name") %>
+            <br>
+            가입일 : <b><%# Eval("user_regdate") %></b>
+            <hr>
+          </ItemTemplate>
+          
+          </ASP:Repeater>
+    
+          리피터로 받아온 변수는 출력할 때, 조작이 가능하다. <%# Eval("user_regdate") %>
+          
+    
+      4. 프로그래밍 코드와 디자인을 분리.
+        분리 방법
+        1) aspx.cs 파일로 만들어서 필요한 코드를 넣는 것.
+        필수 속성인 Inherits 속성과 CodeFile 속성을 지정
+          *디자인 페이지
+          - Inherits : "네임스페이스.클래스" 이름
+          - CodeFile : "aspx.cs 가 있는 파일 경로"
+          *.cs 코드
+          - Page 클래스를 상속해야 함.
+          - class "Inherits에 등록한 클래스 명"
+          
+        2) asp.net에 예약된 '/app_code'에 넣는 것
+          *디자인 페이지
+          - Inherits 속성만 지정해주면 됨.
+          *.cs 코드
+          - Page 상속 동일
+          - 서버컨트롤 정의해줘야 함. (이게 불편)
+    
+        3) 특정한 .aspx 처리 이외의 목적으로 사용하는 "단독 라이브러리" 형식인 .dll로 컴파일하여 "/bin" 폴더에 넣어 사용
+          (프로그램 코드 노출되지 않음)
+          - 컴파일하는 과정이 필요하다. (csc.exe가 컴파일러임.)
+          - cmd 창에 prompt> csc_/t:library_c:\home\test.cs 입력하여 컴파일함.
+          - 컴파일한 파일을 /bin 폴더에 넣고, dll을 참조하는 파일을 /app_code에 넣고 aspx에서 /app_code에 넣는 파일을 참조하여 사용하면 됨.
+
+      5. 템플릿 구성
+        <%@ Register TagPrefix="INCLUDE" TagName="TOP" src="top.ascx" %>
+        <INCLUDE:TOP runat="server" />
+        이런식으로 TOP에 구역을 만들 수 있음. 
+    
+      6. 전역변수 
+        웹의 공유할 수 있는 변수
+        1) Application 변수
+        Application["변수명"] 형식(컬렉션)으로 값을 할당한다
+        [할당]
+        Application["login"] = "abcd"; 
+        [읽기]
+        string tmp = (string)Application["login"];
+        ** bin 에 저장되는 dll의 경우
+        Httpcontext.Current를 앞에 붙여줌.
+
+        2) Session 변수
+        Application변수와 사용하는 방법 동일
+        Application변수는 계속 유지되는 변수
+        Session 변수는 창이 닫히면 다시 초기화 되는 변수
+
+        3) global.asax 파일
+        이 페이지가 있으면 실행되고, 없으면 실행되지 않음
+        - Applictaion 이 시작/종료 시 1번만 실행되는 Event
+          Application_Init
+          Application_Start
+          Application_Dispose
+          Application_End
+        - Session 이 시작/종료 될 때 실행되는 Event
+          Session_Start
+          Session_End
+        
+        
+<게시판 모델링>
+-- 회원 등록  --
+1. 회원 아이디
+2. 회원 비밀번호
+3. 닉네임
+4. 회원 가입일 (현재 시간 자동입력)
+
+* 회원 아이디는 중복확인해야 한다. 
+  - 중복된 아이디라면 "중복된 아이디입니다." 얼럿창
+  1) "중복체크" 버튼 우측에 Label 컨트롤 배치. id는 lblCheckResult
+  2) "회원가입체크" 다음줄에 Label 컨트롤 배치. id는 lblJoinResult
+  3) <form>태그 바로 밑에(위치는 상관없으나 일반적으로 hidden 값은 모아두자) 배치. id 는 hdnCheckID
+  
+  여기서 db 연동하는 중간에 dll파일을 만들어 연동했으나 자꾸 namespace를 못가져오는 현상이 발생했다.
+  하나하나 찾아보니 IIS 상의 경로가 C:\home 으로 되어 있었고
+  프로젝트 파일은 C:\home\home_start에 만든 후 dll의 경로를 C:\home\home_start\bin 으로 했더니 에러가 발생했다.
+  dll의 경로는 iis 상의 경로 C:\home에 bin이 있어야 한다.
+
+(21.02.25)
+<34장~>
+1. 회원가입 기능
+2. 회원로그인 및 로그아웃. 세션 변수를 이용해 상황별 레이아웃 변경 (Panel 웹폼 또는 div 서버컨트롤)
+
+1. 회원 아이디의 특징
+  1) 회원 ID는 비어있을 수 없음. (txtID 속성이 비어있는지 확인)
+  2) 회원 ID는 영문자 또는 숫자로만 가능. (문자열이 영문과 숫자로만 이루어져 있는지)
+  3) 회원 ID는 4자 이상, 12자 이하만 가능. (.Length를 사용할 것.)
+  
+2. 로그인/ 로그아웃 전략
+  top.ascx 에 로그인/ 로그아웃 탭을 만들어 해당 기능하게 하고
+  로그인 시  - login_proc.aspx를 동작
+  로그아웃 시 - logout.aspx를 동작
+  로그인 중이면 --> 로그아웃 창 visible 속성 false
+  반대면 visible 속성 true
+
+  logout.aspx에서 Session.Abandon() 메서드를 사용하여 세션에 해당하는id, password를 모두 날려줄 수 있다.
+
+  <게시글 데이터 베이스 모델링>
+  게시글에는 3가지 종류로 나눌 수 있는데.
+  1. 자유게시판
+  2. 포토게시판
+  3. 방명록
+  그러나 이 3가지 모두 같은 형식의 데이터 베이스로 만들고 게시판 종류에 맞게 땡겨쓰도록 만들 것임
+
+-- 게시판 글 작성자가 쓸 내용 --
+1. 제목
+2. 내용
+3. 파일첨부
+
+[구현]
+제목은 TextBox(id=txtTitle) 로 좀 길게
+내용은 크게 - TextBox(id=txtContent) (textarea 태그로 렌더링) (TextMode=Multiline)
+파일첨부 컨트롤인 FileUpload(id=upload) 웹폼을 배치
+"글쓰기" Button 웹폼 컨트롤. (id=btnWrite)로 지정 (OnClick=btnWrite_Click)
+
+*참고
+어셈블리 참조하여 컴파일하는 방법
+C:\Windows\Microsoft.NET\Framework64\v4.0.30319\csc /t:library /r:c:\home\bin\Database.dll c:\home\bin\Board.cs
+위와 같은 명령어를 .batch파일로 만들어 실행시키면 됨.
+
+결국 서버컨트롤은 렌더를 통해 태그로 변환되는 것이다.
+TextBox --> input 태그 
+Label --> span태그
+DataGrid --> table 태그
 
 
+-- 게시판 글 작성시 자동으로 들어갈 내용 --
+1. 글의 고유한 번호 (각각의 글을 구분하기 위한 중요한 값이다.) 
+2. 게시판 카테고리 (게시판을 한 개가 아니라 두 개 이상을 사용하기 위해서 구분될 것이다)
+3. 작성자
+4. 작성일
+5. 조회수
+6. 추천수
 
-
+-- 게시판 댓글 --
+1. 댓글 고유 번호 (역시 구분에 필요한 값이다)
+2. 댓글이 붙은 게시물 글 번호 (댓글은 글마다 다르게 달리므로 구분을 위해 필요한 겂이다.)
+3. 댓글작성자
+4. 댓글내용
+5. 작성일시
+* 게시판 글의 DB 테이블 : board
+* 게시판 글의 댓글 DB 테이블 : board_comment
