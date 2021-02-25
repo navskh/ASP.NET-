@@ -22,7 +22,7 @@ void Page_Load()
 
 <div id="top">
 	
-	<img src="./img/top.jpg" width="600" height="200">
+	<img src="./img/top.png" width="700" height="200">
 
 </div>
 
