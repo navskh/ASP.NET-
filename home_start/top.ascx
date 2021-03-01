@@ -1,9 +1,9 @@
-<script language="C#" runat="server">
+<script language="C#" runat="server" Debug="true">
 
 void Page_Load()
 {
-  Session["login_id"] = "test";
-  Session["login_nick"] = "테스터";
+  //Session["login_id"] = "test";
+  //Session["login_nick"] = "테스터";
 
   if (Session["login_id"] != null)
   {
@@ -17,6 +17,8 @@ void Page_Load()
 
 <head>
 <title>닷넷 게시판</title>
+
+<link rel="stylesheet" type="text/css" href="/default.css">
 </head>
 <body>
 
@@ -39,13 +41,8 @@ void Page_Load()
 	<a href="board_list.aspx">포토게시판</a>
 	|
 	<a href="">방명록</a>
-
-  <!--
   |
-  <a href="Study.aspx">스터디 테스트</a>
-  |
-  <a href="board_write.aspx">테스트2</a>
-  -->
+  <a href="board_list.aspx?c=qna">질답게시판</a>
 	<hr color="slategray">
 
 </div>

@@ -9,7 +9,7 @@ namespace Study
     private SqlConnection dbcon;
     public Database()
     {
-      dbcon = new SqlConnection("server=NAVSKH;user id=sa;password=jos0109!;database=aspnet;");
+      dbcon = new SqlConnection("server=DESKTOP-3OI9PFA;user id=sa;password=jos0109!;database=aspnet;");
     }
     private void DBOpen()
     {
