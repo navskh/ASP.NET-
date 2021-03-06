@@ -59,9 +59,29 @@ namespace Study
       DB.ExecuteQuery(query);
     }
     
-    public void Recommend(string category, int number)
+    public void Recommend(string user_id, string category, int number)
     {
       string query = String.Format("UPDATE board SET recommend=recommend+1 WHERE category='{0}' AND board_id={1}",category,number);
+      DB.ExecuteQuery(query);
+
+      query = String.Format("INSERT INTO whoRecommend (user_id, board_id) VALUES('{0}', '{1}')", user_id, number);
+      DB.ExecuteQuery(query);
+    }
+
+    public int RecommendCheck(string user_id, int number)
+    {  
+      string query = String.Format("SELECT count(*) from whoRecommend WHERE user_id='{0}' AND board_id={1}",user_id, number);
+    
+      return (int)DB.ExecuteQueryResult(query);
+    
+    }
+
+    public void RecommendMinus(string user_id, string category, int number)
+    {
+      string query = String.Format("UPDATE board SET recommend=recommend-1 WHERE category='{0}' AND board_id={1}",category,number);
+      DB.ExecuteQuery(query);
+
+      query = String.Format("DELETE FROM whoRecommend WHERE board_id={0}", number);
       DB.ExecuteQuery(query);
     }
 

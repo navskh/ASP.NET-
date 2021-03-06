@@ -10,6 +10,7 @@
   int BOARD_ID;
 
   int NOW_PAGE;
+  int RecommendFlag;
 
     void Page_Load(){
 
@@ -47,7 +48,14 @@
       lblRead.Text = row["readnum"].ToString();
       lblRecommend.Text = row["recommend"].ToString();
       lblContent.Text = (string)row["content"];
+      
 
+      RecommendFlag = BOARD_LIB.RecommendCheck((string)Session["login_id"],BOARD_ID); 
+      if(RecommendFlag == 1){
+        btnRecommend.Text = "추천취소";
+      }
+      else btnRecommend.Text = "추천하기";
+    
 
 
       if ((string)row["file_attach"] != "")
@@ -61,9 +69,11 @@
         CommentList();
         BOARD_LIB.ReadUp(CATEGORY_ID, BOARD_ID);
 
+        lblRead.Text = (Int32.Parse(lblRead.Text)+1).ToString(); // 처음 열었을 때 조회수 맞춰줌.
+
         // 수정, 삭제 기능 활성화 체크
         if(!String.IsNullOrEmpty((string)Session["login_id"])){
-          if((string)Session["login_id"] == (string)row["user_id"])
+          if((string)Session["login_id"] == "admin" ||(string)Session["login_id"] == (string)row["user_id"])
           {
             trModifyDelete.Visible = true;
           }
@@ -115,16 +125,31 @@
 
   void btnRecommend_Click(object sender, EventArgs e)
   {
-    Board BOARD_LIB = new Board();
-    BOARD_LIB.Recommend(CATEGORY_ID, BOARD_ID);
+    if (Session["login_id"] == null)
+    {
+      string alert_str = "<script language=JavaScript> alert('추천하고 싶으면 로그인 먼저 하고 와');" +"</"+ "script>";
+      ClientScript.RegisterStartupScript(typeof(Page), "alert", alert_str);
+    }
 
-    btnRecommend.Enabled = false;
-    btnRecommend.Text = "이미 추천하셨습니다.";
+    else
+    {
+      Board BOARD_LIB = new Board();
+      if(RecommendFlag == 0){ // 이전에 추천을 한적이 없다.
+        BOARD_LIB.Recommend((string)Session["login_id"],CATEGORY_ID, BOARD_ID);
+        Page_Load();
+      }
+      else{ // 이전에 추천을 한적이 있다.
+        BOARD_LIB.RecommendMinus((string)Session["login_id"],CATEGORY_ID, BOARD_ID);
+        Page_Load();
+      }
+    }
+
   }
 
   void btnModify_Click(object sender, EventArgs e)
   {
-    Response.Redirect(String.Format("board_write.aspx?c={0}&n={1}", CATEGORY_ID, BOARD_ID));
+    Response.Redirect(String.Format("board_write.aspx?c={0}&n={1}&page={2}&stype={3}&svalue={4}",
+          CATEGORY_ID, BOARD_ID, NOW_PAGE, Request["stype"], Request["svalue"]));
   }
 
   void btnDelete_Click(object sender, EventArgs e)
@@ -155,11 +180,11 @@
   <br>
   내용
   <br>
-  <ASP:Label id="lblContent" runat="server" />
+  <ASP:Label id="lblContent" runat="server" style="word-wrap:break-word; white-space: pre-line; table-layout: fixed;" />
   <br>
   <br>
   <center>
-    <ASP:Button id="btnRecommend" text="추천하기" onclick="btnRecommend_Click" runat="server" />?
+    <ASP:Button id="btnRecommend" text="추천하기" onclick="btnRecommend_Click" runat="server" />
   </center>
   첨부파일 : <ASP:Label id="lblFile" runat="server" />
 

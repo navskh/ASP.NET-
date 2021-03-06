@@ -3,6 +3,8 @@
 <%@ Register TagPrefix="INCLUDE" TagName="BOTTOM" src="bottom.ascx" %>
 <%@ Import Namespace = "Study" %>
 
+<%@ Import Namespace = "System.Drawing" %>
+<%@ Import Namespace = "System.Drawing.Imaging" %>
 
 <script language="C#" runat="server">
 
@@ -85,6 +87,27 @@ void btnWrite_Click(object sender, EventArgs e)
       // 파일명을 변수에 저장(DB에 저장하기 위해)
       upload_file = upload.FileName;
       upload.SaveAs(UPLOAD_PATH + upload_file);
+
+      // --------------------------------섬네일 만들기
+      // 비트맵 클래스로 첨부파일 이미지를 불러옴
+      Bitmap img = new Bitmap(UPLOAD_PATH + upload_file);
+      // Graphics 객체를 시작한다.
+      Graphics g = Graphics.FromImage(img);
+
+      // 크기 변경
+      Bitmap img_newsize = new Bitmap(80, 60);
+      g = Graphics.FromImage(img_newsize);
+      g.DrawImage(img, 0, 0, 80, 60);
+      
+      // 저장
+      img_newsize.Save(UPLOAD_PATH + "small_" + upload_file, ImageFormat.Jpeg);
+
+      // 메모리 해제
+      img.Dispose();
+      img_newsize.Dispose();
+      g.Dispose();
+      //섬네일 만들기 끝
+
     }
 
     // -------[수정 모드 추가]--------
@@ -112,13 +135,16 @@ void btnWrite_Click(object sender, EventArgs e)
       BOARD_LIB.Modify(Int32.Parse(Request["n"]), title, content, upload_file);
 
       // 이후 글보기로 바로 이동
-      Response.Redirect("board_view.aspx?c=" + Request["c"] + "&n=" + Request["n"]);
+    Response.Redirect(
+      "board_view.aspx?c=" + Request["c"] + "&n=" + Request["n"] + "&page=" + Request["page"]
+      + "&stype=" + Request["stype"] + "&svalue=" + Request["svalue"]
+      );
     }
     else{
       //새글 쓰기
     BOARD_LIB.Write(category, user_id, user_name, title, content, upload_file);
 
-    // 이후 리스트로 비로 이동 ('c' 값은 계속 유지)
+    // 이후 리스트로 바로 이동 ('c' 값은 계속 유지)
     Response.Redirect("board_list.aspx?c=" + Request["c"]);
     }
     

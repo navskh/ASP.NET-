@@ -18,7 +18,7 @@ void Page_Load()
 <head>
 <title>닷넷 게시판</title>
 
-<link rel="stylesheet" type="text/css" href="/default.css">
+<link rel="stylesheet" type="text/css" href="/home_start/default.css">
 </head>
 <body>
 
@@ -38,9 +38,9 @@ void Page_Load()
 	| 
 	<a href="board_list.aspx?c=test">자유게시판</a>
 	|
-	<a href="board_list.aspx">포토게시판</a>
+	<a href="board_list.aspx?c=photo">포토게시판</a>
 	|
-	<a href="">방명록</a>
+	<a href="board_list.aspx?c=guestbook">방명록</a>
   |
   <a href="board_list.aspx?c=qna">질답게시판</a>
 	<hr color="slategray">

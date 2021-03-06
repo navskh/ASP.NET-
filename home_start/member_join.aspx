@@ -4,6 +4,11 @@
 
 
 <script language="C#" runat="server">
+  void Page_Load()
+  {
+    lblCheckResult.ForeColor = System.Drawing.Color.Green;
+    lblCheckResult.Text="중복결과 확인";
+  }
   void btnCheck_Click(object sender, EventArgs e)
   {
     string id = txtID.Text;
@@ -149,22 +154,30 @@ void btnJoin_Click(object sender, EventArgs e)
 
 
 <div id="content">
-
-어서옵쇼 회원가입 어쩌고 저쩌고
+<center>
+<h2>어서오세요! 회원가입을 진행해주세요</h2>
+<hr>
 <form runat="server">
 <ASP:HiddenField id="hdnCheckID" runat="server" />
 
-<span>
-  회원아이디
-  <ASP:TextBox id="txtID" runat="server" />
-  <ASP:Button id="btnCheck" runat="server" text="중복체크!" OnClick="btnCheck_Click"/>
-  <ASP:Label id="lblCheckResult" runat="server"/>
+<table >
+  <tr>
+    <td> 회원아이디 </td>
+    <td>  <ASP:TextBox id="txtID" runat="server" /> </td>
+    <td> <ASP:Button id="btnCheck" runat="server" text="중복체크!" OnClick="btnCheck_Click"/> </td>
+    <td> <ASP:Label id="lblCheckResult" runat="server"/> </td>
+  </tr>
+  <tr>
+    <td>  비밀번호 </td>
+    <td> <ASP:TextBox id="txtPass" textmode=password runat="server" /> </td>
+  </tr>
+  <tr>
+    <td>닉네임 </td>
+    <td> <ASP:TextBox id="txtNick" runat="server" /> </td>
+  </tr>
 
-  <br>
-  비밀번호 <ASP:TextBox id="txtPass" textmode=password runat="server" />
+</table>  
 
-  <br>
-  닉네임 <ASP:TextBox id="txtNick" runat="server" />
 
   <br>
   <ASP:Button id="btnJoin" runat="server" text="회원가입 완료" OnClick="btnJoin_Click" />
@@ -175,8 +188,7 @@ void btnJoin_Click(object sender, EventArgs e)
   <br>
   <ASP:DataGrid id="dg1" runat="server" />
 
-</span>
-
+</center>
 </form>
 
 </div>

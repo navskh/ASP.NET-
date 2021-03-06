@@ -1,7 +1,6 @@
-*
-{
-	font-size:12px;
-	font-family:gulim;
+*{
+	font-size:20px;
+	font-family: NanumSquare;
 }
 
 
@@ -19,15 +18,14 @@
 
 #main_menu a:link, a:visited
 {
-	color:blue;
-	text-decoration:none;
+	color:darkcyan;
 	padding:10px;
 }
 
 #main_menu a:hover
 {
-	color:red;
-	background:#eee;
+	color:whitesmoke;
+	background:grey;
 }
 
 
@@ -35,10 +33,10 @@
 
 #footer
 {
-	font-size:11px;
-	font-family:dotum;
+	font-size:18px;
+	font-family:NanumGothic;
 	text-align:center;
-	color:slategray;
+	color:red;
 }
 
 #content
@@ -63,15 +61,14 @@
 #content table tr a:visited
 { 
 	color:black;
-	text-decoration:none;
 }
 
 #content table tr a:hover
 { 
 	color:blue;
-	text-decoration:none;
 }
 
-
-
+a{
+  font-weight: bold;
+}
 
