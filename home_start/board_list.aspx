@@ -1,4 +1,3 @@
-<%@ Page Trace="true" debug="true" %>
 <%@ Register TagPrefix="INCLUDE" TagName="TOP" src="top.ascx" %>
 <%@ Register TagPrefix="BOARD" TagName="TOP" src="board_top.ascx" %>
 <%@ Register TagPrefix="INCLUDE" TagName="BOTTOM" src="bottom.ascx" %>

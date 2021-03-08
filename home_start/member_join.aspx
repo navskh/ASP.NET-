@@ -4,10 +4,13 @@
 
 
 <script language="C#" runat="server">
+
   void Page_Load()
   {
-    lblCheckResult.ForeColor = System.Drawing.Color.Green;
-    lblCheckResult.Text="중복결과 확인";
+    string Password1 = txtPass.Text;
+    txtPass.Attributes.Add("value", Password1);
+    string Password2 = txtPassCheck.Text;
+    txtPassCheck.Attributes.Add("value", Password2);
   }
   void btnCheck_Click(object sender, EventArgs e)
   {
@@ -94,6 +97,8 @@ void btnJoin_Click(object sender, EventArgs e)
 {
   string passwd = txtPass.Text.Trim();
   string nickname = txtNick.Text.Trim();
+  string Telnum = txtTelnum.Text.Trim();
+  string user_type = DropDownList1.SelectedItem.Value;
 
   // 역시 통과했다고 미리 가정.
   bool bChecked = true;
@@ -116,7 +121,17 @@ void btnJoin_Click(object sender, EventArgs e)
   else if (nickname.Length == 0)
   {
     bChecked = false;
-    check_message = "닉네임을 입력하세요.";
+    check_message = "이름을 입력하세요.";
+  }
+  else if (!hdnCheckPass.Value.Equals("1"))
+  {
+    bChecked = false;
+    check_message = "비밀번호 확인이 안되었습니다.";
+  }
+  else if (Telnum.Length == 0)
+  {
+    bChecked = false;
+    check_message = "전화번호를 입력해주세요.";
   }
 
   // 모두 통과됨
@@ -124,7 +139,8 @@ void btnJoin_Click(object sender, EventArgs e)
   {
     // DB에 INSERT로 저장
     Database DB = new Database();
-    string query = "INSERT INTO member(user_id, user_password, nickname) VALUES('" + txtID.Text + "', '" + passwd  + "', '" + nickname  + "')";
+    string query = "INSERT INTO member(user_id, user_password, nickname, user_type, telnum) VALUES('"
+    + txtID.Text + "', '" + passwd  + "', '" + nickname + "', '" + user_type + "', '" + Telnum + "')";
     DB.ExecuteQuery(query);
 
     lblJoinResult.ForeColor = System.Drawing.Color.Blue;
@@ -144,6 +160,21 @@ void btnJoin_Click(object sender, EventArgs e)
 
 }
 
+void btnPassCheck_Click(object sender, EventArgs e)
+{
+  if(txtPassCheck.Text==txtPass.Text){
+    lblPassCheckResult.ForeColor = System.Drawing.Color.Green;
+    lblPassCheckResult.Text = "비밀번호가 확인되었습니다.";
+    hdnCheckPass.Value = "1";
+  }
+  else
+  {
+    lblPassCheckResult.ForeColor = System.Drawing.Color.Red;
+    lblPassCheckResult.Text = "비밀번호가 일치하지않습니다.";
+    hdnCheckPass.Value = "";
+  }
+}
+
 </script>
 
 
@@ -155,25 +186,46 @@ void btnJoin_Click(object sender, EventArgs e)
 
 <div id="content">
 <center>
-<h2>어서오세요! 회원가입을 진행해주세요</h2>
+<h1>어서오세요! 회원가입을 진행해주세요</h1>
 <hr>
 <form runat="server">
 <ASP:HiddenField id="hdnCheckID" runat="server" />
+<ASP:HiddenField id="hdnCheckPass" runat="server" />
 
 <table >
   <tr>
-    <td> 회원아이디 </td>
-    <td>  <ASP:TextBox id="txtID" runat="server" /> </td>
-    <td> <ASP:Button id="btnCheck" runat="server" text="중복체크!" OnClick="btnCheck_Click"/> </td>
-    <td> <ASP:Label id="lblCheckResult" runat="server"/> </td>
+    <td width="150"> 회원아이디 </td>
+    <td width="260" >  <ASP:TextBox id="txtID" runat="server" /> </td>
+    <td> <ASP:Button id="btnCheck" runat="server" text="중복체크!" OnClick="btnCheck_Click"/>
+    <ASP:Label id="lblCheckResult" runat="server"/> </td>
   </tr>
   <tr>
     <td>  비밀번호 </td>
-    <td> <ASP:TextBox id="txtPass" textmode=password runat="server" /> </td>
+    <td> <ASP:TextBox id="txtPass" textmode="password" runat="server" /> </td>
+    <td width=400> </td>
   </tr>
   <tr>
-    <td>닉네임 </td>
+    <td>  비밀번호 확인 </td>
+    <td> <ASP:TextBox id="txtPassCheck" textmode="password" runat="server" /> </td>
+    <td> <ASP:Button id="btnPassCheck" runat="server" text="비밀번호 체크" OnClick="btnPassCheck_Click"/>
+      <ASP:Label id="lblPassCheckResult" runat="server"/> </td>
+  </tr>
+  <tr>
+    <td> 이름은 </td>
     <td> <ASP:TextBox id="txtNick" runat="server" /> </td>
+  </tr>
+  <tr>
+    <td> 직책은 </td>
+    <td> <ASP:DropDownList id="DropDownList1" runat="server"> 
+      <asp:ListItem Value="Manger">운영자</asp:ListItem>
+      <asp:ListItem Value="PD">개발자</asp:ListItem>
+      <asp:ListItem Value="teacher">학교관계자</asp:ListItem>
+    </asp:DropDownList>
+    </td>                
+  </tr>
+  <tr>
+    <td> 전화번호 </td>
+    <td> <ASP:TextBox id="txtTelnum" runat="server" /> </td>
   </tr>
 
 </table>  
@@ -183,7 +235,7 @@ void btnJoin_Click(object sender, EventArgs e)
   <ASP:Button id="btnJoin" runat="server" text="회원가입 완료" OnClick="btnJoin_Click" />
   
   <br>
-  <ASP:Label id="lblJoinResult" runat="server" text = "기본" />
+  <ASP:Label id="lblJoinResult" runat="server" text = "" />
 
   <br>
   <ASP:DataGrid id="dg1" runat="server" />

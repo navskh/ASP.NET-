@@ -23,9 +23,11 @@ void Page_Load()
 <body>
 
 <div id="top">
-	
-	<img src="./img/top.png" width="700" height="200">
-
+  <center>
+	<a href="index.aspx">
+	  <img src="./img/top.png" width="700" height="200">
+  </a>
+  </center>
 </div>
 
 <div id="main_menu">
