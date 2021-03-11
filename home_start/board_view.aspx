@@ -175,6 +175,18 @@
 <center>
   <h2>게시글 확인!</h2>
   <br>
+<<<<<<< HEAD
+=======
+  내용
+  <br>
+  <ASP:Label id="lblContent" runat="server" style="word-wrap:break-word; white-space: pre-line; table-layout: fixed;" />
+  <br>
+  <br>
+  <center>
+    <ASP:Button id="btnRecommend" text="추천하기" onclick="btnRecommend_Click" runat="server" />
+  </center>
+  첨부파일 : <ASP:Label id="lblFile" runat="server" />
+>>>>>>> 98bf81b08597eb5ac8af7f075610ae85cdbed5da
 
   <table>
     <tr>

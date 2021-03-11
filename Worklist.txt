@@ -536,5 +536,8 @@ DataGrid --> table 태그
 
 
   4. 디자인 관련해서 수정 필요
+<<<<<<< HEAD
   
+=======
+>>>>>>> 98bf81b08597eb5ac8af7f075610ae85cdbed5da
   

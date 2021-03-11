@@ -120,6 +120,10 @@ void btnWrite_Click(object sender, EventArgs e)
       img_newsize.Dispose();
       g.Dispose();
       //섬네일 만들기 끝
+<<<<<<< HEAD
+=======
+
+>>>>>>> 98bf81b08597eb5ac8af7f075610ae85cdbed5da
     }
 
     // -------[수정 모드 추가]--------

@@ -103,7 +103,10 @@
     {
       phBoard1.Visible = false;
       phBoard3.Visible = false;
+<<<<<<< HEAD
       phBoard4.Visible = false;
+=======
+>>>>>>> 98bf81b08597eb5ac8af7f075610ae85cdbed5da
       rptList2.DataSource = dtList;
       rptList2.DataBind();
     }
@@ -111,7 +114,10 @@
     {
       phBoard1.Visible = false;
       phBoard2.Visible = false;
+<<<<<<< HEAD
       phBoard4.Visible = false;
+=======
+>>>>>>> 98bf81b08597eb5ac8af7f075610ae85cdbed5da
 
       // <form> 없애기
       frm.Visible = false;
@@ -122,6 +128,7 @@
 
       
     }
+<<<<<<< HEAD
     else if(CATEGORY_ID.ToLower().Equals("study"))
     {
       phBoard1.Visible = false;
@@ -130,15 +137,23 @@
       rptList.DataSource = dtList;
       rptList.DataBind();
     }
+=======
+>>>>>>> 98bf81b08597eb5ac8af7f075610ae85cdbed5da
     else
     {
       phBoard2.Visible = false;
       phBoard3.Visible = false;
+<<<<<<< HEAD
       phBoard4.Visible = false;
       rptList.DataSource = dtList;
       rptList.DataBind();
     }
 
+=======
+      rptList.DataSource = dtList;
+      rptList.DataBind();
+    }
+>>>>>>> 98bf81b08597eb5ac8af7f075610ae85cdbed5da
     // 게시판 리스트 변경 끝
   }  
 
@@ -241,12 +256,15 @@
       Response.Redirect("board_list.aspx?c=" + CATEGORY_ID);
     }
   }
+<<<<<<< HEAD
 
   void btnWriteboard_Click(object sender, EventArgs e)
   {
     CATEGORY_ID = Request["c"];
     Response.Redirect("board_write.aspx?c=pims");
   }
+=======
+>>>>>>> 98bf81b08597eb5ac8af7f075610ae85cdbed5da
 </script>
 
 <INCLUDE:TOP runat="server" />
@@ -301,6 +319,7 @@
 </table>
 </ASP:PlaceHolder>
 
+<<<<<<< HEAD
 <!-- 포토게시판 시작 -->
 <ASP:PlaceHolder id="phBoard2" runat="server">
   <tr>
@@ -322,6 +341,12 @@
 				
 	</td>
 </tr>
+=======
+  <ASP:PlaceHolder id="phBoard1" runat="server">
+
+  <tr align="center" bgcolor="#abcdef">
+    <td width="30">123</td>
+>>>>>>> 98bf81b08597eb5ac8af7f075610ae85cdbed5da
 
 </ASP:PlaceHolder>
 
@@ -426,6 +451,79 @@
   
   </ItemTemplate>
 </ASP:Repeater>
+<<<<<<< HEAD
+=======
+
+</ASP:PlaceHolder>
+
+<ASP:PlaceHolder id="phBoard2" runat="server">
+  <tr>
+	<td colspan="6">
+
+
+		<table width="600">
+			<tr align="center">
+        <ASP:Repeater id="rptList2" runat="server" OnItemDataBound="rptList2_Bound">
+        <ItemTemplate>
+				<td width="120">
+          <a href="board_view.aspx?c=<%# CATEGORY_ID %>&page=<%# NOW_PAGE %>&n=<%# Eval("board_id") %>&stype=<%# STYPE %>&svalue=<%# SVALUE %>">
+          <img src=/home_start/upload/small_<%# Eval("file_attach") %> width="80"><br><%# Eval("title") %></a></td>	
+        <ASP:Literal id="liSeperate" runat="server"/>
+        </ItemTemplate>
+        </ASP:Repeater>       
+			</tr>      
+		</table>
+				
+	</td>
+</tr>
+
+</ASP:PlaceHolder>
+
+<!-- 방명록 시작 -->
+
+<ASP:PlaceHolder id="phBoard3" runat="server">
+<form runat="server">
+
+<tr>
+	<td>
+    <font color="blue" style="border:1 solid slategray; padding:5px; display:block; background:#efc">
+				글 써주세용!ㅎㅎ
+    </font>
+			<br>
+			당신은 누구?
+			<ASP:TextBox id="txtName" runat="server" />
+			<br><br>
+			<ASP:TextBox id="txtContent" textmode="multiline" width="600" height="100" runat="server" />
+      
+			<center>
+				<ASP:Button id="btnWrite" runat="server" text="글 남기기" onClick="btnWrite_Click" />
+			</center>
+
+      <ASP:Label id="lblError" text="오류메세지" runat="server" />
+</form>
+			<br><br><br>
+      <ASP:Repeater id="rptList3" runat="server">
+      <ItemTemplate>
+			<div style="border:1 solid; padding:10px; background:#efe; margin-top:20px; line-height:20px;">
+				<b style="color:#000077">
+          [<%# Eval("user_name") %>]님이
+          <%# ToCustomTime(Eval("regdate")) %> 에 작성하신 글
+        </b>
+        <hr>
+
+        <table style="word-wrap:break-word; white-space: pre-line; table-layout: fixed;">
+          <tr>
+            <td> <%# Eval("content") %> </td>
+          </tr>
+        </table>
+			</div>
+    </ItemTemplate>
+    </ASP:Repeater>
+	</td>
+</tr>
+</ASP:PlaceHolder>
+
+>>>>>>> 98bf81b08597eb5ac8af7f075610ae85cdbed5da
 </table>
 </ASP:PlaceHolder>
 <!-- 교육 내용 영역 끝 -->
@@ -445,10 +543,16 @@
   </table>  
 </center>
 
+<<<<<<< HEAD
   <ASP:Button class="btn btn-info" runat="server" id="btnWrite_board" text="글쓰기" onclick="btnWriteboard_Click" />
   </form>
 <br>
 <br>
+=======
+  <br><br>
+
+  <a href=board_write.aspx?c=<%= CATEGORY_ID %>>글쓰기</a>
+>>>>>>> 98bf81b08597eb5ac8af7f075610ae85cdbed5da
 
 
 <ASP:Label class="pagination2" id="lblPageMove1" runat="server">이전페이지 / 다음페이지</ASP:Label>
