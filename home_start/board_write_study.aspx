@@ -14,7 +14,7 @@ string AttachedFile = "";
 
 void Page_Load(){
 
-  lbluserIdentity.Text = (string)Session["login_id"] + "(" + (string)Session["login_nick"] + ")";
+  lbluserIdentity.Text = (string)Session["login_id"];
   //n 값이 넘어왔다면
   if(!String.IsNullOrEmpty(Request["n"]))
   {
@@ -59,12 +59,8 @@ void btnWrite_Click(object sender, EventArgs e)
 {
   string title = txtTitle.Text.Trim();
   string content = txtContent.Text.Trim();
-  string ServiceID = txtServiceID.Text.Trim();
-  string ServiceName = txtServiceName.Text.Trim();
-  string Developer = DeveloperList.SelectedValue;
-  string type = Board_Type.SelectedValue;
-  string Due_Date = txtDueDate.Text.Trim();
-
+  string 
+  
   string message = "";  
   bool IsChecked = true;
     
@@ -72,13 +68,11 @@ void btnWrite_Click(object sender, EventArgs e)
   // 빈 값을 체크. || 는 OR 이다. ('~또는'라고 해석하자)
   // title이 빈 문자열이거나 content 가 빈 문자열이라면..
   if (title == "" || 
-  content.Equals("")||
-  ServiceID.Equals("")||
-  ServiceName.Equals("")
+  content.Equals("") ||
   )
   {
     IsChecked = false;
-    message = "서비스 명, 서비스 ID, 제목, 내용 중에 빈칸이 올 수 없습니다.";
+    message = "제목이나 내용은 빈 칸으로 둘 수 없습니다.";
   }
 
 
@@ -120,6 +114,7 @@ void btnWrite_Click(object sender, EventArgs e)
       img_newsize.Dispose();
       g.Dispose();
       //섬네일 만들기 끝
+
     }
 
     // -------[수정 모드 추가]--------
@@ -154,10 +149,7 @@ void btnWrite_Click(object sender, EventArgs e)
     }
     else{
       //새글 쓰기
-    //BOARD_LIB.Write(category, user_id, user_name, title, content, upload_file);
-
-    //Pims 글쓰기
-    BOARD_LIB.Write_PIMS(category, ServiceName, ServiceID, Developer, Due_Date, user_id, user_name, title, type, content, upload_file);
+    BOARD_LIB.Write(category, user_id, user_name, title, content, upload_file);
 
     // 이후 리스트로 바로 이동 ('c' 값은 계속 유지)
     Response.Redirect("board_list.aspx?c=" + Request["c"]);
@@ -202,10 +194,10 @@ void btnList_Click(object sender, EventArgs e)
 
   <tr>
     <td class="table-primary"> 서비스 명 </td>
-    <td > <ASP:TextBox class="form-control2" placeholder="서비스명을 입력해주세요" id="txtServiceName" runat="server" /> </td>
+    <td > <ASP:TextBox class="form-control2" id="txtServiceName" runat="server" /> </td>
 
     <td class="table-primary"> 서비스ID </td>
-    <td > <ASP:TextBox class="form-control2" placeholder="서비스아이디를 입력해주세요" id="txtServiceID" runat="server" /> </td>
+    <td > <ASP:TextBox class="form-control2" id="txtServiceID" runat="server" /> </td>
 
     <td class="table-primary"> 개발 담당자 </td>
     <td > 
@@ -229,9 +221,7 @@ void btnList_Click(object sender, EventArgs e)
 
   <tr>
     <td class="table-primary" > 제목 </td>
-    <td colspan="3"> <ASP:TextBox class="form-control2" placeholder="제목을 입력해주세요" id="txtTitle" runat="server" /> </td>
-    <td class="table-primary"> 요청기한 </td>
-    <td> <ASP:TextBox class="form-control2" placeholder="요청기한을 입력해주세요" id="txtDueDate" runat="server" /> </td>
+    <td colspan="5"> <ASP:TextBox class="form-control2" id="txtTitle" runat="server" /> </td>
     <td class="table-primary"> 대분류 </td>
     <td >
       <ASP:DropDownList class="form-control2" id="Board_Type" runat="server">

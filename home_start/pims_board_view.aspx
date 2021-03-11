@@ -38,7 +38,7 @@
       CATEGORY_ID = Request["c"];
       BOARD_ID = Int32.Parse(Request["n"]);
       Board BOARD_LIB = new Board();
-      DataTable dtView = BOARD_LIB.Read(CATEGORY_ID, BOARD_ID);
+      DataTable dtView = BOARD_LIB.Read_PIMS(CATEGORY_ID, BOARD_ID);
       DataRow row = dtView.Rows[0];
 
       

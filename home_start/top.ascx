@@ -2,15 +2,18 @@
 
 void Page_Load()
 {
-  //Session["login_id"] = "test";
-  //Session["login_nick"] = "테스터";
+  Session["login_id"] = "test";
+  Session["login_nick"] = "테스터";
 
   if (Session["login_id"] != null)
   {
-    login_start.Visible = false;
-    login_done.Visible = true;
-    lblNickName.Text = (string)Session["login_nick"];
+    login.Visible = false;
+    member_join.Visible = false;
+    logout.Visible = true;
+
+    lblNickName.Text = (string)(Session["login_nick"]+"님 로그인 되었습니다.");
   }
+  lblNickName.ForeColor = System.Drawing.Color.White;
 }
 </script>
 
@@ -18,51 +21,48 @@ void Page_Load()
 <head>
 <title>닷넷 게시판</title>
 
-<link rel="stylesheet" type="text/css" href="/home_start/default.css">
+<!--<link rel="stylesheet" type="text/css" href="/home_start/default.css">-->
+
+<link rel="stylesheet" type="text/css" href="/home_start/bootstrap.css">
+
+
 </head>
 <body>
 
 <div id="top">
-	
-	<img src="./img/top.png" width="700" height="200">
-
+  <center>
+  <a href="index.aspx">
+    <img src="./img/jinhak.png" width="1000" height="280">
+  </a>
+  </center>
 </div>
 
-<div id="main_menu">
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarColor01" aria-controls="navbarColor01" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
 
+  <ul class="navbar-nav mr-auto">
+    <li class="nav-item"><a class="nav-link" href="index.aspx">메인화면</a></li>
 
-	<a href="index.aspx">메인화면</a>
-	|
-	<a href="member_join.aspx">회원가입</a>
-  <!--회원가입 메뉴로 이동!-->
-	| 
-	<a href="board_list.aspx?c=test">자유게시판</a>
-	|
-	<a href="board_list.aspx?c=photo">포토게시판</a>
-	|
-	<a href="board_list.aspx?c=guestbook">방명록</a>
-  |
-  <a href="board_list.aspx?c=qna">질답게시판</a>
-	<hr color="slategray">
+  <span id="member_join" runat="server">  
+    <li class="nav-item"><a class="nav-link" href="member_join.aspx">회원가입</a> </li>
+  </span>
 
-</div>
+  <span id="login" runat="server">
+    <li class="nav-item"><a class="nav-link" href="member_login.aspx">로그인</a> </li>
+  </span> 
+    <li class="nav-item"><a class="nav-link" href="board_list.aspx?c=pims">1. PIMS요청사항</a> </li>
+    <li class="nav-item"><a class="nav-link" href="board_list.aspx?c=study">2. 교육내용정리</a> </li>
+    <li class="nav-item"><a class="nav-link" href="board_list.aspx?c=photo">(포토게시판)</a></li>
+    <li class="nav-item"><a class="nav-link" href="board_list.aspx?c=guestbook">(방명록)</a></li>
+    <li class="nav-item"><a class="nav-link" href="board_list.aspx?c=qna">(질답게시판)</a> </li>
+  </ul>
 
-
-<div id="login_start" runat="server" style="background-color:#eeddff">
-  <form action="login_proc.aspx" method="post" style="display:inline; margin:0">
-    <font color="blue">[로그인]</font>
-    ID : <input type="text" id="user_id" name="user_id" size="10">
-    PW : <input type="password" id="user_pw" name="user_pw" size="10">
-    <input type="submit" value="로그인">
-  </form>
-</div>
-
-<div id="login_done" runat="server" style="background-color:#eeddff" visible="false">
-  <form action="logout.aspx" style="display:inline; margin:0">
-  어서오세요! <ASP:Label id="lblNickName" runat="server" /> 님. 반갑습니다.
-  <input type="submit" value="로그아웃">
-  </form>
-</div>
-
+  <span id="logout" runat="server" visible="false">
+  <a class="nav-link" href="logout.aspx">로그아웃</a> 
+  </span>
+  <b><ASP:Label id="lblNickName" runat="server" Text=""/> </b>
+</nav>
 
 </body>

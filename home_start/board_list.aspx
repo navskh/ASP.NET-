@@ -1,4 +1,3 @@
-<%@ Page Trace="true" debug="true" %>
 <%@ Register TagPrefix="INCLUDE" TagName="TOP" src="top.ascx" %>
 <%@ Register TagPrefix="BOARD" TagName="TOP" src="board_top.ascx" %>
 <%@ Register TagPrefix="INCLUDE" TagName="BOTTOM" src="bottom.ascx" %>
@@ -56,6 +55,10 @@
       BOARD_LIB.PAGE_SIZE = 12;
 
     // 리스트 가져오기
+    if(CATEGORY_ID.ToLower().Equals("pims"))
+    dtList = BOARD_LIB.List_PIMS(NOW_PAGE, STYPE, SVALUE);
+    
+    else
     dtList = BOARD_LIB.List(CATEGORY_ID, NOW_PAGE, STYPE, SVALUE);
     
     // 총 글 수 가져오기
@@ -72,11 +75,17 @@
     }
     // 글수, 페이지 수 넣어주기
     lblPage.Text = String.Format("[{0}] 개의 글 (<b>{1}</b> / {2} Page)",TOTAL_COUNT, NOW_PAGE, PAGE_COUNT);
+    lblPage2.Text = String.Format("[{0}] 개의 글 (<b>{1}</b> / {2} Page)",TOTAL_COUNT, NOW_PAGE, PAGE_COUNT);
 
-    // 좌측 페이지 이동
-    lblPageMove1.Text = BOARD_LIB.PageGen1(NOW_PAGE,PAGE_COUNT,"page",
+    if(PAGE_COUNT==0) lblPageMove1.Visible = false;
+
+    else
+    {
+      // 좌측 페이지 이동
+      lblPageMove1.Text = BOARD_LIB.PageGen1(NOW_PAGE,PAGE_COUNT,"page",
         String.Format("c={0}&stype={1}&svalue={2}", CATEGORY_ID, STYPE, SVALUE));
-
+    }
+    
     // 우측 페이지 이동
     if(TOTAL_COUNT != 0)
     {
@@ -86,7 +95,7 @@
     }
     else 
     {
-      lblPageMove2.Text = "페이지 없음";
+      lblPageMove2.Visible = false;
     }
 
     // ---------- 포토 게시판 리스트는 다른 리스트로 보이게끔 수정..
@@ -94,6 +103,7 @@
     {
       phBoard1.Visible = false;
       phBoard3.Visible = false;
+      phBoard4.Visible = false;
       rptList2.DataSource = dtList;
       rptList2.DataBind();
     }
@@ -101,6 +111,7 @@
     {
       phBoard1.Visible = false;
       phBoard2.Visible = false;
+      phBoard4.Visible = false;
 
       // <form> 없애기
       frm.Visible = false;
@@ -108,14 +119,26 @@
       // DataBind() 를 위한 코드 추가 예정
       rptList3.DataSource = dtList;
       rptList3.DataBind();
+
+      
     }
-    else
+    else if(CATEGORY_ID.ToLower().Equals("study"))
     {
+      phBoard1.Visible = false;
       phBoard2.Visible = false;
       phBoard3.Visible = false;
       rptList.DataSource = dtList;
       rptList.DataBind();
     }
+    else
+    {
+      phBoard2.Visible = false;
+      phBoard3.Visible = false;
+      phBoard4.Visible = false;
+      rptList.DataSource = dtList;
+      rptList.DataBind();
+    }
+
     // 게시판 리스트 변경 끝
   }  
 
@@ -218,6 +241,12 @@
       Response.Redirect("board_list.aspx?c=" + CATEGORY_ID);
     }
   }
+
+  void btnWriteboard_Click(object sender, EventArgs e)
+  {
+    CATEGORY_ID = Request["c"];
+    Response.Redirect("board_write.aspx?c=pims");
+  }
 </script>
 
 <INCLUDE:TOP runat="server" />
@@ -227,61 +256,52 @@
 
 <br><br>
 
-  <center>
-
-  <h2>게시판 목록</h2>
-  <hr width="650" color="green">
-
-
-  <table width="600">
-  <tr>
-    <td colspan="6" align="right">
-    <ASP:Label id="lblPage" runat="server" text="[123]개의 글 (1 / 999 page)" />
-    </td>
-  </tr>
-
   <ASP:PlaceHolder id="phBoard1" runat="server">
 
-  <tr align="center" bgcolor="#abcdef">
-    <td width="30">123</td>
+  <center>
 
-    <td>제목</td>
+  <h2><b>PIMS 요청사항 목록</b></h2>
 
-    <td width="80">작성자</td>
 
-    <td width="80">작성일시</td>
+  <table class="table table-hover">
 
-    <td width="35">조회</td>
+  <tr>
+    <th colspan="6" align="right">
+    <ASP:Label id="lblPage" runat="server" text="[123]개의 글 (1 / 999 page)" />
+    </th>
+  </tr>  
 
-    <td width="35">추천</td>
-    
-  </tr>
+  <tr align="center" class="table-info">
+    <td>번호</td>
+    <td width="45%">제목</td>
+    <td>작성자</td>
+    <td>작성일시</td>   
+</tr>
 
 
 <ASP:Repeater id="rptList" runat="server" OnItemDataBound="rptList_Bound">
   <ItemTemplate>
   <tr align="center">
-    <td width="30"><ASP:Label id="lblNum" runat="server" /></td>
+    <td width="10%"><ASP:Label id="lblNum" runat="server" /></td>
 
-    <td align="left">
-      <a href=board_view.aspx?c=<%# CATEGORY_ID %>&page=<%# NOW_PAGE %>&n=<%#Eval("board_id")%>&stype=<%# STYPE %>&svalue=<%# SVALUE %>>
+    <td>
+      <a class="table-link" 
+      href=pims_board_view.aspx?c=<%# CATEGORY_ID %>&page=<%# NOW_PAGE %>&n=<%#Eval("board_id")%>&stype=<%# STYPE %>&svalue=<%# SVALUE %>>
         <%# CheckSearch((string)Eval("title"))%>
       </a>
     </td>
 
-    <td width="80"><%# Eval("user_name")%></td>
+    <td ><%# Eval("user_name")%></td>
 
-    <td width="100"><%# (ToCustomTime(Eval("regdate")))%></td>
-
-    <td width="35"><%# Eval("readnum")%></td>
-
-    <td width="35"><%# Eval("recommend")%></td>
+    <td><%# (ToCustomTime(Eval("regdate")))%></td>
   </tr>
+  
   </ItemTemplate>
 </ASP:Repeater>
-
+</table>
 </ASP:PlaceHolder>
 
+<!-- 포토게시판 시작 -->
 <ASP:PlaceHolder id="phBoard2" runat="server">
   <tr>
 	<td colspan="6">
@@ -305,6 +325,8 @@
 
 </ASP:PlaceHolder>
 
+<!-- 포토게시판 끝-->
+
 <!-- 방명록 시작 -->
 
 <ASP:PlaceHolder id="phBoard3" runat="server">
@@ -313,23 +335,21 @@
 <tr>
 	<td>
     <font color="blue" style="border:1 solid slategray; padding:5px; display:block; background:#efc">
-				글 써주세용!ㅎㅎ
+				방명록입니다.
     </font>
 			<br>
-			당신은 누구?
+			방문객 이름
 			<ASP:TextBox id="txtName" runat="server" />
 			<br><br>
 			<ASP:TextBox id="txtContent" textmode="multiline" width="600" height="100" runat="server" />
       
 			<center>
-				<ASP:Button id="btnWrite" runat="server" text="글 남기기" onClick="btnWrite_Click" />
+				<ASP:Button class="btn btn-primary" id="btnWrite" runat="server" text="글 남기기" onClick="btnWrite_Click" />
 			</center>
 
+      <ASP:Label id="lblError" text="오류메세지" runat="server" />
 </form>
-
-			<ASP:Label id="lblError" forecolor="red" runat="server" text="[오류메시지 용도]" />
 			<br><br><br>
-
       <ASP:Repeater id="rptList3" runat="server">
       <ItemTemplate>
 			<div style="border:1 solid; padding:10px; background:#efe; margin-top:20px; line-height:20px;">
@@ -337,49 +357,108 @@
           [<%# Eval("user_name") %>]님이
           <%# ToCustomTime(Eval("regdate")) %> 에 작성하신 글
         </b>
-				<hr>
-				<%# Eval("content") %>
+        <hr>
+
+        <table style="word-wrap:break-word; white-space: pre-line; table-layout: fixed;">
+          <tr>
+            <td> <%# Eval("content") %> </td>
+          </tr>
+        </table>
 			</div>
-      </ItemTemplate>
-      </ASP:Repeater>
+    </ItemTemplate>
+    </ASP:Repeater>
 	</td>
 </tr>
 </ASP:PlaceHolder>
-  
+<!-- 방명록 끝 -->
 </table>
 
-<br><br>
+<!-- 교육 내용 영역 시작 -->
+  <ASP:PlaceHolder id="phBoard4" runat="server">
+  <center>
+
+  <h2><b>교육 내용 정리</b></h2>
+
+
+  <table class="table table-hover">
+
+  <tr>
+    <th colspan="6" align="right">
+    <ASP:Label id="lblPage2" runat="server" text="[123]개의 글 (1 / 999 page)" />
+    </th>
+  </tr>  
+
+  <tr align="center" class="table-info">
+    <td>번호</td>
+
+    <td width="45%">제목</td>
+
+    <td>작성자</td>
+
+    <td>작성일시</td>
+
+    <td>조회</td>
+
+    <td>추천</td>
+    
+  </tr>
+
+
+<ASP:Repeater id="rptList_study" runat="server" OnItemDataBound="rptList_Bound">
+  <ItemTemplate>
+  <tr align="center">
+    <td width="10%"><ASP:Label id="lblNum" runat="server" /></td>
+
+    <td>
+      <a class="table-link" 
+      href=board_view.aspx?c=<%# CATEGORY_ID %>&page=<%# NOW_PAGE %>&n=<%#Eval("board_id")%>&stype=<%# STYPE %>&svalue=<%# SVALUE %>>
+        <%# CheckSearch((string)Eval("title"))%>
+      </a>
+    </td>
+
+    <td ><%# Eval("user_name")%></td>
+
+    <td><%# (ToCustomTime(Eval("regdate")))%></td>
+
+    <td ><%# Eval("readnum")%></td>
+    <td ><%# Eval("recommend")%></td>
+  </tr>
+  
+  </ItemTemplate>
+</ASP:Repeater>
+</table>
+</ASP:PlaceHolder>
+<!-- 교육 내용 영역 끝 -->
+
 <center>
   <form id="frm" runat="server">
-    <ASP:DropDownList id="lstType" runat="server">
-      <ASP:ListItem value="title" text="제목" />
-      <ASP:ListItem value="title" text="내용" />
-    </ASP:DropDownList>
-
-    <ASP:TextBox id="txtSearch" runat="server" />
-    <ASP:Button id="btnSearch" text="검색시작" runat="server" onclick="btnSearch_Click" />
-    <ASP:Button id="btnCancel" text="검색취소" visible="false" runat="server" onclick="btnCancel_Click" />
-  </form>
+  <table>
+    <tr>
+      <td width="150"> <ASP:DropDownList class="form-control" id="lstType" runat="server">
+        <ASP:ListItem value="title" text="제목" />
+        <ASP:ListItem value="content" text="내용" /> 
+      </ASP:DropDownList>  </td>
+      <td width="250"> <ASP:TextBox id="txtSearch" class="form-control" runat="server" /> </td>
+      <td> <ASP:Button class="btn btn-primary" id="btnSearch" text="검색시작" runat="server" onclick="btnSearch_Click" /> </td>
+      <td><ASP:Button class="btn btn-primary" id="btnCancel" text="검색취소" visible="false" runat="server" onclick="btnCancel_Click" /> </td>
+    </tr>
+  </table>  
 </center>
 
-  <br><br>
-
-  <a href=board_write.aspx?c=<%= CATEGORY_ID %>>글쓰기</a>
-
-
+  <ASP:Button class="btn btn-info" runat="server" id="btnWrite_board" text="글쓰기" onclick="btnWriteboard_Click" />
+  </form>
+<br>
 <br>
 
-<table width="600">
-<tr bgcolor="#eeeeee">
-<td width="50%">
-  <ASP:Label id="lblPageMove1" runat="server">이전페이지 / 다음페이지</ASP:Label>
-</td>
 
-<td width="50%" align="right">
-  <ASP:Label id="lblPageMove2" runat="server">[이전10] <b>1</b> 2 3 4 5 6 7 8 9 10 [다음10]</ASP:Label>
-</td>
-</tr>
-</table>
+<ASP:Label class="pagination2" id="lblPageMove1" runat="server">이전페이지 / 다음페이지</ASP:Label>
+
+
+<ul class="pagination pagination-lg">
+<li class="page-item">
+  <ASP:Label id="lblPageMove2" class="page-item" runat="server">[이전10] <b>1</b> 2 3 4 5 6 7 8 9 10 [다음10]</ASP:Label>
+</li>
+</ul>
 
 <br><br>
 

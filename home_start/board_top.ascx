@@ -8,18 +8,19 @@
     // 'C' 값이 비어있어도 잘못된 접근
     if(String.IsNullOrEmpty(CATEGORY))
     {
-      Response.Redirect("board_cateogrymsg.aspx");
+      Response.Redirect("board_cateogorymsg.aspx");
     }
     // 값이 있다면 체크
     else
     {
       // 다음값들만 허용되므로 아니라면 오류
-      if(!(CATEGORY.Equals("test") ||
+      if(!(CATEGORY.Equals("pims") ||
           CATEGORY.Equals("qna") ||
           CATEGORY.Equals("photo") ||
-          CATEGORY.Equals("guestbook")))
+          CATEGORY.Equals("guestbook")||
+          CATEGORY.Equals("study")))
           {
-            Response.Redirect("board_cateogrymsg.aspx");
+            Response.Redirect("board_cateogorymsg.aspx");
           }
     }
     // 카테고리 검사 끝 

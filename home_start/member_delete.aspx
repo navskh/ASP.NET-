@@ -186,53 +186,34 @@ void btnPassCheck_Click(object sender, EventArgs e)
 
 <div id="content">
 <center>
-<h1>어서오세요! 회원가입을 진행해주세요</h1>
+<h1>회원탈퇴를 진행합니다.</h1>
 <hr>
 <form runat="server">
 <ASP:HiddenField id="hdnCheckID" runat="server" />
 <ASP:HiddenField id="hdnCheckPass" runat="server" />
 
-<table class = table-member>
+<table >
   <tr>
     <td width="150"> 회원아이디 </td>
-    <td width="260" >  <ASP:TextBox class="form-control" id="txtID" runat="server" /> </td>
-    <td> <ASP:Button class="btn btn-danger" id="btnCheck" runat="server" text="중복체크!" OnClick="btnCheck_Click"/>
+    <td width="260" >  <ASP:TextBox id="txtID" runat="server" /> </td>
+    <td> <ASP:Button id="btnCheck" runat="server" text="중복체크!" OnClick="btnCheck_Click"/>
     <ASP:Label id="lblCheckResult" runat="server"/> </td>
   </tr>
   <tr>
-    <td>  비밀번호  </td>
-    <td> <ASP:TextBox class="form-control" id="txtPass" textmode="password" runat="server" /> </td>
+    <td>  비밀번호 </td>
+    <td> <ASP:TextBox id="txtPass" textmode="password" runat="server" /> </td>
     <td width=400> </td>
   </tr>
   <tr>
-    <td>  비밀번호 확인 </td>
-    <td> <ASP:TextBox class="form-control" id="txtPassCheck" textmode="password" runat="server" /> </td>
-    <td> <ASP:Button class="btn btn-success" id="btnPassCheck" runat="server" text="비밀번호 체크" OnClick="btnPassCheck_Click"/>
-      <ASP:Label id="lblPassCheckResult" runat="server"/> </td>
-  </tr>
-  <tr>
-    <td>  이름은 </td>
-    <td> <ASP:TextBox class="form-control" id="txtNick" runat="server" /> </td>
-  </tr>
-  <tr>
-    <td>  직책은  </td>
-    <td> <ASP:DropDownList class="form-control" id="DropDownList1" runat="server"> 
-      <asp:ListItem Value="Manger">운영자</asp:ListItem>
-      <asp:ListItem Value="PD">개발자</asp:ListItem>
-      <asp:ListItem Value="teacher">학교관계자</asp:ListItem>
-    </asp:DropDownList>
-    </td>                
-  </tr>
-  <tr>
-    <td>  전화번호  </td>
-    <td> <ASP:TextBox class="form-control" id="txtTelnum" runat="server" /> </td>
+    <td> 이름 </td>
+    <td> <ASP:TextBox id="txtNick" runat="server" /> </td>
   </tr>
 
 </table>  
 
 
   <br>
-  <ASP:Button class="btn btn-info" id="btnJoin" runat="server" text="회원가입 완료" OnClick="btnJoin_Click" />
+  <ASP:Button id="btnJoin" runat="server" text="회원탈퇴 확인" OnClick="btnDelete_Click" />
   
   <br>
   <ASP:Label id="lblJoinResult" runat="server" text = "" />

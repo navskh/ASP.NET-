@@ -27,15 +27,91 @@ namespace Study
       DB.ExecuteQuery(query);
     }
 
+    public void Write_PIMS( string category, string ServiceName, string ServiceID, string Developer, string Due_Date,
+    string user_id, string user_name, string title, string type, string content, string upload_file)
+    {
+      string query = String.Format("INSERT INTO pims_board (category, ServiceName, UnivServiceID, DeveloperID, Due_Date," +
+      "user_id, user_name, title, Board_Type, content, file_attach, condition) "+ 
+      "VALUES('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}', '{8}', '{9}', '{10}', '접수')", 
+      category, ServiceName, ServiceID, Developer, Due_Date, user_id, user_name, title, type, content, upload_file);
+
+      DB.ExecuteQuery(query);
+    }
+
     // 게시판 목록
     public DataTable List(string category)
     {
       return DB.ExecuteQueryDataTable("SELECT * FROM board WHERE category='" + category + "' ORDER BY board_id desc");
     }
 
+    
+    public DataTable List(string category, string search_target, string search_word)
+    {
+      return DB.ExecuteQueryDataTable(
+        "SELECT * FROM board WHERE category= '" + category + "' AND " + search_target + " LiKE '%" + search_word + "%' ORDER BY board_id DESC" 
+      );
+    }
+
+    public DataTable List(string category, int now_page, string search_target, string search_word)
+    {
+      // now_page = 3;
+      int start_id, end_id;
+
+      start_id = (now_page-1) * PAGE_SIZE;
+      end_id = (now_page * PAGE_SIZE) + 1;
+
+      System.Text.StringBuilder query = new System.Text.StringBuilder();
+      query.Append("SELECT * FROM");
+      query.Append(" ( ");
+      query.Append("SELECT ROW_NUMBER() OVER(ORDER BY board_id DESC) AS row_num, * FROM board tmp");
+      query.Append(" WHERE category = '" + category + "' ");
+      if(!String.IsNullOrEmpty(search_target) && !String.IsNullOrEmpty(search_word))
+        query.Append(" AND " + search_target + " LIKE '%" + search_word + "%' ");
+      query.Append(" ) ");
+      query.Append(" AS BOARD_NUMBERED ");
+      query.Append(String.Format(" WHERE row_num>{0} AND row_num<{1}",start_id, end_id));
+
+      return DB.ExecuteQueryDataTable(query.ToString());
+      
+    }
+
+    public DataTable List_PIMS()
+    {
+      return DB.ExecuteQueryDataTable("SELECT * FROM pims_board ORDER BY board_id desc");
+    }
+
+    public DataTable List_PIMS(int now_page, string search_target, string search_word)
+    {
+      int start_id, end_id;
+
+      start_id = (now_page-1) * PAGE_SIZE;
+      end_id = (now_page * PAGE_SIZE) + 1;
+
+      System.Text.StringBuilder query = new System.Text.StringBuilder();
+      query.Append("SELECT * FROM");
+      query.Append(" ( ");
+      query.Append("SELECT ROW_NUMBER() OVER(ORDER BY board_id DESC) AS row_num, * FROM pims_board tmp");
+      query.Append(" WHERE category='pims'");
+      if(!String.IsNullOrEmpty(search_target) && !String.IsNullOrEmpty(search_word))
+        query.Append(" AND " + search_target + " LIKE '%" + search_word + "%' ");
+      query.Append(" ) ");
+      query.Append(" AS BOARD_NUMBERED ");
+      query.Append(String.Format(" WHERE row_num>{0} AND row_num<{1}",start_id, end_id));
+
+      return DB.ExecuteQueryDataTable(query.ToString());
+      
+    }
+
+
     public DataTable Read(string category, int number)
     {
       string query = String.Format("SELECT * FROM board WHERE category='{0}' AND board_id={1}", category, number);
+      return DB.ExecuteQueryDataTable(query);         
+    }
+
+    public DataTable Read_PIMS(string category, int number)
+    {
+      string query = String.Format("SELECT * FROM pims_board WHERE category='{0}' AND board_id={1}", category, number);
       return DB.ExecuteQueryDataTable(query);         
     }
 
@@ -103,35 +179,6 @@ namespace Study
       DB.ExecuteQuery(query);
     }
 
-    public DataTable List(string category, string search_target, string search_word)
-    {
-      return DB.ExecuteQueryDataTable(
-        "SELECT * FROM board WHERE category= '" + category + "' AND " + search_target + " LiKE '%" + search_word + "%' ORDER BY board_id DESC" 
-      );
-    }
-
-    public DataTable List(string category, int now_page, string search_target, string search_word)
-    {
-      // now_page = 3;
-      int start_id, end_id;
-
-      start_id = (now_page-1) * PAGE_SIZE;
-      end_id = (now_page * PAGE_SIZE) + 1;
-
-      System.Text.StringBuilder query = new System.Text.StringBuilder();
-      query.Append("SELECT * FROM");
-      query.Append(" ( ");
-      query.Append("SELECT ROW_NUMBER() OVER(ORDER BY board_id DESC) AS row_num, * FROM board tmp");
-      query.Append(" WHERE category = '" + category + "' ");
-      if(!String.IsNullOrEmpty(search_target) && !String.IsNullOrEmpty(search_word))
-        query.Append(" AND " + search_target + " LIKE '%" + search_word + "%' ");
-      query.Append(" ) ");
-      query.Append(" AS BOARD_NUMBERED ");
-      query.Append(String.Format(" WHERE row_num>{0} AND row_num<{1}",start_id, end_id));
-
-      return DB.ExecuteQueryDataTable(query.ToString());
-      
-    }
 
     public int ListCount(string category, string search_target, string search_word)
     {
@@ -158,7 +205,7 @@ namespace Study
       if(!now_page.Equals(1))
       {
         // 1페이지가 아니면 무조건 이동 가능
-        page_str += String.Format("<a href='{0}?{1}={2}&{3}'>이전페이지</a>",
+        page_str += String.Format("<a class='text-success' href='{0}?{1}={2}&{3}'>◀이전</a>",
           HttpContext.Current.Request.ServerVariables["SCRIPT_NAME"],
           page_val_str,
           now_page-1,
@@ -167,7 +214,7 @@ namespace Study
       else
       {
           // 이동불가 : 링크 없음
-          page_str += "이전페이지";
+          page_str += "◁이전";
       }
       // 구분자는 무조건 넣어주고
       page_str += "|";
@@ -176,7 +223,7 @@ namespace Study
       if(!now_page.Equals(total_page))
       {
         // 끝 페이지가 아니면 무조건 이동가능
-        page_str += String.Format("<a href='{0}?{1}={2}&{3}'>다음페이지 ▶</a>",
+        page_str += String.Format("<a class='text-success' href='{0}?{1}={2}&{3}'>다음▶</a>",
           HttpContext.Current.Request.ServerVariables["SCRIPT_NAME"],
           page_val_str,
           now_page+1,
@@ -184,7 +231,7 @@ namespace Study
       }
       else
       {
-          page_str += "다음페이지";
+          page_str += "다음▷";
       }
 
       return page_str;
@@ -208,17 +255,21 @@ namespace Study
 
    // 첫 페이지 이동링크
     if (page != 1)
-    tmp += String.Format("<a href='{0}'>[1]</a> .. ", LINK_STR.Replace("#PG#", "1"));
+    tmp += String.Format("<li class='page-item'><a href='{0}' class='page-link'><<</a></li>", LINK_STR.Replace("#PG#", "1"));
+    else
+    {
+      tmp += String.Format("<li class='page-item disabled'><a href='{0}' class='page-link'><<</a></li>", LINK_STR.Replace("#PG#", "1"));
+    }
 
     // 첫 블럭은 [이전n]이 없음 링크도 없음
-    if (NOW_BLOCK == 1)
-    tmp += String.Format("[이전 {0}개] .. ", blockcount);
-    // 두번째 블럭은 [이전n]에 링크
-    // 공식: 현재 블럭에서 앞으로 두칸 앞 블럭수에서 블럭단위를 곱해주고 +1 을 해주면 이전블럭의 첫 페이지가 구해짐
-    else
-    tmp += String.Format("<a href='{0}'>[이전 {1}개]</a> .. ",
-      LINK_STR.Replace("#PG#", ((NOW_BLOCK-2)*blockcount+1).ToString()  ),
-      blockcount);
+    // if (NOW_BLOCK == 1)
+    // tmp += String.Format("[이전 {0}개]", blockcount);
+    // // 두번째 블럭은 [이전n]에 링크
+    // // 공식: 현재 블럭에서 앞으로 두칸 앞 블럭수에서 블럭단위를 곱해주고 +1 을 해주면 이전블럭의 첫 페이지가 구해짐
+    // else
+    // tmp += String.Format("<li class='page-item'><a href='{0}' class='page-link'>[이전 {1}개]</a></li>",
+    //   LINK_STR.Replace("#PG#", ((NOW_BLOCK-2)*blockcount+1).ToString()  ),
+    //   blockcount);
 
     for (int i=1; i <= blockcount; i++)
     {
@@ -226,12 +277,12 @@ namespace Study
       // 숫자가 현재페이지와 같으면 그냥 링크없이 빨간색 진하게 표시
       if (START_NUMBER + i == page)
       {
-        tmp += String.Format(" <font color='red'><b>{0}</b></font> ", page);
+        tmp += String.Format(" <li class='page-item active'><a class='page-link' href=#>{0}</a></li> ", page);
       }
       // 다르면 링크가능
       else
       {
-        tmp += String.Format(" <a href='{0}'>{1}</a> ",
+        tmp += String.Format("<li class='page-item'><a href='{0}' class='page-link'>{1}</a></li>",
             LINK_STR.Replace("#PG#", (START_NUMBER+i).ToString()),
             ((NOW_BLOCK-1)*blockcount + i ));
       }
@@ -242,17 +293,24 @@ namespace Study
 
 
     // 다음 블럭은 현재의 블럭과 총 블럭이 같지 않을 때 표시
-    if (NOW_BLOCK == TOTAL_BLOCK)
-      tmp += String.Format(" .. [다음 {0}개] ", blockcount);
-    else
-      tmp += String.Format(" .. <a href='{0}'>[다음 {1}개]</a> ",
-        LINK_STR.Replace("#PG#", ((NOW_BLOCK*blockcount)+1).ToString()  ),
-        blockcount);
+    // if (NOW_BLOCK == TOTAL_BLOCK)
+    //   tmp += String.Format(" .. [다음 {0}개] ", blockcount);
+    // else
+    //   tmp += String.Format(" .. <a href='{0}'>[다음 {1}개]</a> ",
+    //     LINK_STR.Replace("#PG#", ((NOW_BLOCK*blockcount)+1).ToString()  ),
+    //     blockcount);
     // 마지막 페이지 이동링크
-    if (page != 1)
-      tmp += String.Format(" .. <a href='{0}'>[{1}]</a>",
+    if (page != totalpage)
+      tmp += String.Format(" <li class='page-item'> <a class='page-link' href='{0}'>>></a> </li>",
             LINK_STR.Replace("#PG#", totalpage.ToString()),
             totalpage);
+    else
+    {
+        tmp += String.Format(" <li class='page-item disabled'> <a class='page-link' href='{0}'>>></a> </li>",
+            LINK_STR.Replace("#PG#", totalpage.ToString()),
+            totalpage);
+    }
+    
 
     // 만든 페이징 리턴
     return tmp;
