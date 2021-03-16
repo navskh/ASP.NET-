@@ -115,6 +115,14 @@ namespace Study
       return DB.ExecuteQueryDataTable(query);         
     }
 
+    public DataTable Read_User(string user_id)
+    {
+      string query = String.Format("SELECT * FROM member WHERE user_id='{0}'", user_id);
+
+      return DB.ExecuteQueryDataTable(query);
+    }
+
+    
     public void CommentWrite(int board_id, string user_id, string user_name, string content)
     {
       string query = String.Format("INSERT INTO board_comment(board_id, user_id, user_name, content) VALUES({0}, '{1}', '{2}', '{3}')",
@@ -168,6 +176,23 @@ namespace Study
       DB.ExecuteQuery(query);
     }
 
+    public void Modify_PIMS(int number, string ServiceName, string ServiceID, string Developer, string Due_Date,
+    string title, string type, string content, string upload_file)
+    {
+      string query = String.Format("UPDATE pims_board SET ServiceName='{0}', UnivServiceID='{1}', DeveloperID='{2}',"+
+      "Due_Date='{3}', title='{4}', Board_Type='{5}', content='{6}', file_attach='{7}', regdate=getdate() WHERE board_id={8}",  
+      ServiceName, ServiceID, Developer, Due_Date, title, type, content, upload_file, number);
+
+      DB.ExecuteQuery(query);
+    }
+
+    public void Update_condition(string Developer, string condition, int number)
+    {
+      string query = String.Format("UPDATE pims_board SET DeveloperID='{0}', condition='{1}' WHERE board_id={2}", Developer, condition, number);
+
+      DB.ExecuteQuery(query);
+    }
+
     public void Remove(string category, int number)
     {
       // 1. 댓글 삭제
@@ -179,6 +204,16 @@ namespace Study
       DB.ExecuteQuery(query);
     }
 
+    public void Remove_PIMS(string category, int number)
+    {
+      // 1. 댓글 삭제
+      string query = String.Format("DELETE FROM board_comment WHERE board_id={0}", number);
+      DB.ExecuteQuery(query);
+
+      // 2. 글 삭제
+      query = String.Format("DELETE FROM pims_board WHERE category='{0}' AND board_id={1}", category, number);
+      DB.ExecuteQuery(query);
+    }
 
     public int ListCount(string category, string search_target, string search_word)
     {
@@ -190,6 +225,18 @@ namespace Study
 
       return (int)DB.ExecuteQueryResult(query);
     }
+
+    public int ListCount_PIMS(string category, string search_target, string search_word)
+    {
+      string query = "SELECT COUNT(*) FROM pims_board WHERE category='" + category + "' ";
+
+      // 검색어가 있을 때
+      if(!String.IsNullOrEmpty(search_target) && !String.IsNullOrEmpty(search_word))
+        query += " AND " + search_target + " LIKE '%" + search_word + "%' ";
+
+      return (int)DB.ExecuteQueryResult(query);
+    }
+
 
     // 이전/ 다음 페이지 생성
     // 인수     1: 현재 페이지 번호

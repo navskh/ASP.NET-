@@ -2,8 +2,8 @@
 
 void Page_Load()
 {
-  Session["login_id"] = "test";
-  Session["login_nick"] = "테스터";
+  //Session["login_id"] = "tester";
+  //Session["login_nick"] = "tester";
 
   if (Session["login_id"] != null)
   {
@@ -11,7 +11,7 @@ void Page_Load()
     member_join.Visible = false;
     logout.Visible = true;
 
-    lblNickName.Text = (string)(Session["login_nick"]+"님 로그인 되었습니다.");
+    lblNickName.Text = (string)(Session["login_nick"]+ "님 (" + Session["user_type"] + "님)로그인 되었습니다.");
   }
   lblNickName.ForeColor = System.Drawing.Color.White;
 }
@@ -21,42 +21,10 @@ void Page_Load()
 <head>
 <title>닷넷 게시판</title>
 
-<<<<<<< HEAD
 <!--<link rel="stylesheet" type="text/css" href="/home_start/default.css">-->
-=======
-<link rel="stylesheet" type="text/css" href="/home_start/default.css">
-</head>
-<body>
-
-<div id="top">
-  <center>
-	<a href="index.aspx">
-	  <img src="./img/top.png" width="700" height="200">
-  </a>
-  </center>
-</div>
-
-<div id="main_menu">
->>>>>>> 98bf81b08597eb5ac8af7f075610ae85cdbed5da
 
 <link rel="stylesheet" type="text/css" href="/home_start/bootstrap.css">
 
-<<<<<<< HEAD
-=======
-	<a href="index.aspx">메인화면</a>
-	|
-	<a href="member_join.aspx">회원가입</a>
-  <!--회원가입 메뉴로 이동!-->
-	| 
-	<a href="board_list.aspx?c=test">자유게시판</a>
-	|
-	<a href="board_list.aspx?c=photo">포토게시판</a>
-	|
-	<a href="board_list.aspx?c=guestbook">방명록</a>
-  |
-  <a href="board_list.aspx?c=qna">질답게시판</a>
-	<hr color="slategray">
->>>>>>> 98bf81b08597eb5ac8af7f075610ae85cdbed5da
 
 </head>
 <body>
@@ -86,9 +54,6 @@ void Page_Load()
   </span> 
     <li class="nav-item"><a class="nav-link" href="board_list.aspx?c=pims">1. PIMS요청사항</a> </li>
     <li class="nav-item"><a class="nav-link" href="board_list.aspx?c=study">2. 교육내용정리</a> </li>
-    <li class="nav-item"><a class="nav-link" href="board_list.aspx?c=photo">(포토게시판)</a></li>
-    <li class="nav-item"><a class="nav-link" href="board_list.aspx?c=guestbook">(방명록)</a></li>
-    <li class="nav-item"><a class="nav-link" href="board_list.aspx?c=qna">(질답게시판)</a> </li>
   </ul>
 
   <span id="logout" runat="server" visible="false">

@@ -55,14 +55,19 @@
       BOARD_LIB.PAGE_SIZE = 12;
 
     // 리스트 가져오기
-    if(CATEGORY_ID.ToLower().Equals("pims"))
-    dtList = BOARD_LIB.List_PIMS(NOW_PAGE, STYPE, SVALUE);
-    
+    if(CATEGORY_ID.ToLower().Equals("pims")) 
+    {
+      dtList = BOARD_LIB.List_PIMS(NOW_PAGE, STYPE, SVALUE);
+      TOTAL_COUNT = BOARD_LIB.ListCount_PIMS(CATEGORY_ID, STYPE, SVALUE);
+    }
+  
     else
-    dtList = BOARD_LIB.List(CATEGORY_ID, NOW_PAGE, STYPE, SVALUE);
-    
+    {
+      dtList = BOARD_LIB.List(CATEGORY_ID, NOW_PAGE, STYPE, SVALUE);
+      TOTAL_COUNT = BOARD_LIB.ListCount(CATEGORY_ID, STYPE, SVALUE);
+    }
+  
     // 총 글 수 가져오기
-    TOTAL_COUNT = BOARD_LIB.ListCount(CATEGORY_ID, STYPE, SVALUE);
     
     if(TOTAL_COUNT != 0)
     {
@@ -99,62 +104,22 @@
     }
 
     // ---------- 포토 게시판 리스트는 다른 리스트로 보이게끔 수정..
-    if(CATEGORY_ID.ToLower().Equals("photo"))
+    if(CATEGORY_ID.ToLower().Equals("pims"))
     {
-      phBoard1.Visible = false;
-      phBoard3.Visible = false;
-<<<<<<< HEAD
       phBoard4.Visible = false;
-=======
->>>>>>> 98bf81b08597eb5ac8af7f075610ae85cdbed5da
-      rptList2.DataSource = dtList;
-      rptList2.DataBind();
+      rptList.DataSource = dtList;
+      rptList.DataBind();
     }
-    else if(CATEGORY_ID.ToLower().Equals("guestbook"))
-    {
-      phBoard1.Visible = false;
-      phBoard2.Visible = false;
-<<<<<<< HEAD
-      phBoard4.Visible = false;
-=======
->>>>>>> 98bf81b08597eb5ac8af7f075610ae85cdbed5da
-
-      // <form> 없애기
-      frm.Visible = false;
-
-      // DataBind() 를 위한 코드 추가 예정
-      rptList3.DataSource = dtList;
-      rptList3.DataBind();
-
-      
-    }
-<<<<<<< HEAD
     else if(CATEGORY_ID.ToLower().Equals("study"))
     {
       phBoard1.Visible = false;
-      phBoard2.Visible = false;
-      phBoard3.Visible = false;
       rptList.DataSource = dtList;
       rptList.DataBind();
     }
-=======
->>>>>>> 98bf81b08597eb5ac8af7f075610ae85cdbed5da
-    else
+    else 
     {
-      phBoard2.Visible = false;
-      phBoard3.Visible = false;
-<<<<<<< HEAD
-      phBoard4.Visible = false;
-      rptList.DataSource = dtList;
-      rptList.DataBind();
+      Response.Redirect("./board_categorymsg.aspx");
     }
-
-=======
-      rptList.DataSource = dtList;
-      rptList.DataBind();
-    }
->>>>>>> 98bf81b08597eb5ac8af7f075610ae85cdbed5da
-    // 게시판 리스트 변경 끝
   }  
 
   string ToCustomTime(object datetime)
@@ -185,17 +150,21 @@
     int VIRTUAL_NUM = TOTAL_COUNT - e.Item.ItemIndex - ((NOW_PAGE-1) * BOARD_LIB.PAGE_SIZE) ;
 
     ((Label)e.Item.FindControl("lblNum")).Text = VIRTUAL_NUM.ToString();
-  }
 
-  // 포토게시판 리피터 이벤트
-  void rptList2_Bound(object sender, RepeaterItemEventArgs e)
-  {
-    // e.Item.ItemIndex 는 0 부터 시작
-    // 4fh 나눈 값이 0이면  '</tr>''<tr>' 을 넣어줌.
-    if ((e.Item.ItemIndex+1) % 4 == 0 && (e.Item.ItemIndex+1) != BOARD_LIB.PAGE_SIZE)
+    if(((Label)e.Item.FindControl("lblcondition")).Text == "불가")
     {
-      ((Literal)e.Item.FindControl("liSeperate")).Text = "</tr><tr align='center'>";
+      ((Label)e.Item.FindControl("lblTR_Open")).Text = "<tr class='table-danger'>";
     }
+    else if(((Label)e.Item.FindControl("lblcondition")).Text == "처리중")
+    ((Label)e.Item.FindControl("lblTR_Open")).Text = "<tr class='table-light'>";
+    else if(((Label)e.Item.FindControl("lblcondition")).Text == "지연")
+    ((Label)e.Item.FindControl("lblTR_Open")).Text = "<tr class='table-warning'>";
+    else if(((Label)e.Item.FindControl("lblcondition")).Text == "완료")
+    ((Label)e.Item.FindControl("lblTR_Open")).Text = "<tr class='table-success'>";
+    else
+    ((Label)e.Item.FindControl("lblTR_Open")).Text = "<tr>";
+
+    ((Label)e.Item.FindControl("lblTR_Close")).Text = "</tr>";
   }
 
   void btnSearch_Click(object sender, EventArgs e){
@@ -235,36 +204,34 @@
     else return src;
   }
 
-  void btnWrite_Click(object sender, EventArgs e)
-  {
-    string name = txtName.Text.Trim();
-    string content = txtContent.Text.Trim();
-
-    // 공백 체크
-    if(name.Equals("") || content.Equals(""))
-    {
-      lblError.Text = "이름이나 내용은 빈 칸으로 둘 수 없습니다.";
-    }
-    
-    // 저장
-    else
-    {
-      // 방명록 저장
-      BOARD_LIB.Write(CATEGORY_ID, "", name, "", content, "");
-      
-      // 리스트 새로 열기
-      Response.Redirect("board_list.aspx?c=" + CATEGORY_ID);
-    }
-  }
-<<<<<<< HEAD
 
   void btnWriteboard_Click(object sender, EventArgs e)
   {
     CATEGORY_ID = Request["c"];
-    Response.Redirect("board_write.aspx?c=pims");
+    string USER_ID = (string)Session["login_id"];
+    
+    if(String.IsNullOrEmpty(USER_ID)) 
+    {
+      string alert_str = "<script language=JavaScript> alert('글을 작성하려면 로그인하세요.');" +"</"+ "script>";
+      ClientScript.RegisterStartupScript(typeof(Page), "alert", alert_str);
+    }
+
+    else{
+      DataTable dtUser = BOARD_LIB.Read_User(USER_ID);
+      DataRow user = dtUser.Rows[0];
+      string user_type = (string)user["user_type"];
+
+      if(user_type == "Manger")
+      {
+        Response.Redirect("board_write.aspx?c=pims");  
+      }
+      else{ 
+        string alert_str = "<script language=JavaScript> alert('운영자만 요청글을 작성할 수 있습니다.');" +"</"+ "script>";
+        ClientScript.RegisterStartupScript(typeof(Page), "alert", alert_str);
+      }
+    }
+    
   }
-=======
->>>>>>> 98bf81b08597eb5ac8af7f075610ae85cdbed5da
 </script>
 
 <INCLUDE:TOP runat="server" />
@@ -289,9 +256,12 @@
     </th>
   </tr>  
 
-  <tr align="center" class="table-info">
+  <tr  class="table-info">
     <td>번호</td>
-    <td width="45%">제목</td>
+    <td>제목</td>
+    <td> 개발담당자 </td>
+    <td> 요청상태 </td>
+    <td> 우선순위 </td>
     <td>작성자</td>
     <td>작성일시</td>   
 </tr>
@@ -299,104 +269,30 @@
 
 <ASP:Repeater id="rptList" runat="server" OnItemDataBound="rptList_Bound">
   <ItemTemplate>
-  <tr align="center">
+    <ASP:Label id="lblTR_Open" runat="server" /> 
     <td width="10%"><ASP:Label id="lblNum" runat="server" /></td>
 
     <td>
+      <ASP:Label id="lblAhref" runat="server" />
       <a class="table-link" 
       href=pims_board_view.aspx?c=<%# CATEGORY_ID %>&page=<%# NOW_PAGE %>&n=<%#Eval("board_id")%>&stype=<%# STYPE %>&svalue=<%# SVALUE %>>
         <%# CheckSearch((string)Eval("title"))%>
       </a>
     </td>
+    <td> <%# Eval("DeveloperID")%> </td>
+    <td> <ASP:Label id="lblcondition" runat="server" Text=<%# Eval("condition")%>/> </td>
+    <td> <%# Eval("Due_Date")%> </td>
 
     <td ><%# Eval("user_name")%></td>
 
     <td><%# (ToCustomTime(Eval("regdate")))%></td>
-  </tr>
+    <ASP:Label id="lblTR_Close" runat="server" />
   
   </ItemTemplate>
 </ASP:Repeater>
 </table>
 </ASP:PlaceHolder>
 
-<<<<<<< HEAD
-<!-- 포토게시판 시작 -->
-<ASP:PlaceHolder id="phBoard2" runat="server">
-  <tr>
-	<td colspan="6">
-
-
-		<table width="600">
-			<tr align="center">
-        <ASP:Repeater id="rptList2" runat="server" OnItemDataBound="rptList2_Bound">
-        <ItemTemplate>
-				<td width="120">
-          <a href="board_view.aspx?c=<%# CATEGORY_ID %>&page=<%# NOW_PAGE %>&n=<%# Eval("board_id") %>&stype=<%# STYPE %>&svalue=<%# SVALUE %>">
-          <img src=/home_start/upload/small_<%# Eval("file_attach") %> width="80"><br><%# Eval("title") %></a></td>	
-        <ASP:Literal id="liSeperate" runat="server"/>
-        </ItemTemplate>
-        </ASP:Repeater>       
-			</tr>      
-		</table>
-				
-	</td>
-</tr>
-=======
-  <ASP:PlaceHolder id="phBoard1" runat="server">
-
-  <tr align="center" bgcolor="#abcdef">
-    <td width="30">123</td>
->>>>>>> 98bf81b08597eb5ac8af7f075610ae85cdbed5da
-
-</ASP:PlaceHolder>
-
-<!-- 포토게시판 끝-->
-
-<!-- 방명록 시작 -->
-
-<ASP:PlaceHolder id="phBoard3" runat="server">
-<form runat="server">
-
-<tr>
-	<td>
-    <font color="blue" style="border:1 solid slategray; padding:5px; display:block; background:#efc">
-				방명록입니다.
-    </font>
-			<br>
-			방문객 이름
-			<ASP:TextBox id="txtName" runat="server" />
-			<br><br>
-			<ASP:TextBox id="txtContent" textmode="multiline" width="600" height="100" runat="server" />
-      
-			<center>
-				<ASP:Button class="btn btn-primary" id="btnWrite" runat="server" text="글 남기기" onClick="btnWrite_Click" />
-			</center>
-
-      <ASP:Label id="lblError" text="오류메세지" runat="server" />
-</form>
-			<br><br><br>
-      <ASP:Repeater id="rptList3" runat="server">
-      <ItemTemplate>
-			<div style="border:1 solid; padding:10px; background:#efe; margin-top:20px; line-height:20px;">
-				<b style="color:#000077">
-          [<%# Eval("user_name") %>]님이
-          <%# ToCustomTime(Eval("regdate")) %> 에 작성하신 글
-        </b>
-        <hr>
-
-        <table style="word-wrap:break-word; white-space: pre-line; table-layout: fixed;">
-          <tr>
-            <td> <%# Eval("content") %> </td>
-          </tr>
-        </table>
-			</div>
-    </ItemTemplate>
-    </ASP:Repeater>
-	</td>
-</tr>
-</ASP:PlaceHolder>
-<!-- 방명록 끝 -->
-</table>
 
 <!-- 교육 내용 영역 시작 -->
   <ASP:PlaceHolder id="phBoard4" runat="server">
@@ -451,79 +347,6 @@
   
   </ItemTemplate>
 </ASP:Repeater>
-<<<<<<< HEAD
-=======
-
-</ASP:PlaceHolder>
-
-<ASP:PlaceHolder id="phBoard2" runat="server">
-  <tr>
-	<td colspan="6">
-
-
-		<table width="600">
-			<tr align="center">
-        <ASP:Repeater id="rptList2" runat="server" OnItemDataBound="rptList2_Bound">
-        <ItemTemplate>
-				<td width="120">
-          <a href="board_view.aspx?c=<%# CATEGORY_ID %>&page=<%# NOW_PAGE %>&n=<%# Eval("board_id") %>&stype=<%# STYPE %>&svalue=<%# SVALUE %>">
-          <img src=/home_start/upload/small_<%# Eval("file_attach") %> width="80"><br><%# Eval("title") %></a></td>	
-        <ASP:Literal id="liSeperate" runat="server"/>
-        </ItemTemplate>
-        </ASP:Repeater>       
-			</tr>      
-		</table>
-				
-	</td>
-</tr>
-
-</ASP:PlaceHolder>
-
-<!-- 방명록 시작 -->
-
-<ASP:PlaceHolder id="phBoard3" runat="server">
-<form runat="server">
-
-<tr>
-	<td>
-    <font color="blue" style="border:1 solid slategray; padding:5px; display:block; background:#efc">
-				글 써주세용!ㅎㅎ
-    </font>
-			<br>
-			당신은 누구?
-			<ASP:TextBox id="txtName" runat="server" />
-			<br><br>
-			<ASP:TextBox id="txtContent" textmode="multiline" width="600" height="100" runat="server" />
-      
-			<center>
-				<ASP:Button id="btnWrite" runat="server" text="글 남기기" onClick="btnWrite_Click" />
-			</center>
-
-      <ASP:Label id="lblError" text="오류메세지" runat="server" />
-</form>
-			<br><br><br>
-      <ASP:Repeater id="rptList3" runat="server">
-      <ItemTemplate>
-			<div style="border:1 solid; padding:10px; background:#efe; margin-top:20px; line-height:20px;">
-				<b style="color:#000077">
-          [<%# Eval("user_name") %>]님이
-          <%# ToCustomTime(Eval("regdate")) %> 에 작성하신 글
-        </b>
-        <hr>
-
-        <table style="word-wrap:break-word; white-space: pre-line; table-layout: fixed;">
-          <tr>
-            <td> <%# Eval("content") %> </td>
-          </tr>
-        </table>
-			</div>
-    </ItemTemplate>
-    </ASP:Repeater>
-	</td>
-</tr>
-</ASP:PlaceHolder>
-
->>>>>>> 98bf81b08597eb5ac8af7f075610ae85cdbed5da
 </table>
 </ASP:PlaceHolder>
 <!-- 교육 내용 영역 끝 -->
@@ -543,16 +366,10 @@
   </table>  
 </center>
 
-<<<<<<< HEAD
   <ASP:Button class="btn btn-info" runat="server" id="btnWrite_board" text="글쓰기" onclick="btnWriteboard_Click" />
   </form>
 <br>
 <br>
-=======
-  <br><br>
-
-  <a href=board_write.aspx?c=<%= CATEGORY_ID %>>글쓰기</a>
->>>>>>> 98bf81b08597eb5ac8af7f075610ae85cdbed5da
 
 
 <ASP:Label class="pagination2" id="lblPageMove1" runat="server">이전페이지 / 다음페이지</ASP:Label>

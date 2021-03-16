@@ -11,6 +11,8 @@
     txtPass.Attributes.Add("value", Password1);
     string Password2 = txtPassCheck.Text;
     txtPassCheck.Attributes.Add("value", Password2);
+
+    btnGotoLogin.Visible = false;
   }
   void btnCheck_Click(object sender, EventArgs e)
   {
@@ -140,20 +142,20 @@ void btnJoin_Click(object sender, EventArgs e)
     // DB에 INSERT로 저장
     Database DB = new Database();
     string query = "INSERT INTO member(user_id, user_password, nickname, user_type, telnum) VALUES('"
-<<<<<<< HEAD
     + txtID.Text + "', '" + passwd  + "', '" + nickname + "', '" + user_type + "', '" + txtTelnum.Text + "')";
-=======
-    + txtID.Text + "', '" + passwd  + "', '" + nickname + "', '" + user_type + "', '" + Telnum + "')";
->>>>>>> 98bf81b08597eb5ac8af7f075610ae85cdbed5da
     DB.ExecuteQuery(query);
 
     lblJoinResult.ForeColor = System.Drawing.Color.Blue;
-    lblJoinResult.Text = "회원가입이 완료되었습니다. 총 멤버의 정보를 알려드립니다.";
+    lblJoinResult.Text = "회원가입이 완료되었습니다.";
 
-    dg1.DataSource = DB.ExecuteQueryDataTable("Select * from member");
-    dg1.DataBind();
-    // 로그인 완료 페이지로 이동
-    //Response.Redirect("member_join_finish.aspx");
+    //dg1.DataSource = DB.ExecuteQueryDataTable("Select * from //member");
+    //dg1.DataBind();
+
+    // 로그인 완료 얼럿창
+    string alert_str = "<script language=JavaScript> alert('회원가입이 완료되었습니다.');" +"</"+ "script>";
+    ClientScript.RegisterStartupScript(typeof(Page), "alert", alert_str);
+
+    btnGotoLogin.Visible = true;
   }
   // 오류발생
   else
@@ -179,6 +181,10 @@ void btnPassCheck_Click(object sender, EventArgs e)
   }
 }
 
+void btnGotoLogin_Click(object sender, EventArgs e)
+{
+  Response.Redirect("member_login.aspx");
+}
 </script>
 
 
@@ -196,7 +202,6 @@ void btnPassCheck_Click(object sender, EventArgs e)
 <ASP:HiddenField id="hdnCheckID" runat="server" />
 <ASP:HiddenField id="hdnCheckPass" runat="server" />
 
-<<<<<<< HEAD
 <table class = table-member>
   <tr>
     <td width="150"> 회원아이디 </td>
@@ -207,47 +212,21 @@ void btnPassCheck_Click(object sender, EventArgs e)
   <tr>
     <td>  비밀번호  </td>
     <td> <ASP:TextBox class="form-control" id="txtPass" textmode="password" runat="server" /> </td>
-=======
-<table >
-  <tr>
-    <td width="150"> 회원아이디 </td>
-    <td width="260" >  <ASP:TextBox id="txtID" runat="server" /> </td>
-    <td> <ASP:Button id="btnCheck" runat="server" text="중복체크!" OnClick="btnCheck_Click"/>
-    <ASP:Label id="lblCheckResult" runat="server"/> </td>
-  </tr>
-  <tr>
-    <td>  비밀번호 </td>
-    <td> <ASP:TextBox id="txtPass" textmode="password" runat="server" /> </td>
->>>>>>> 98bf81b08597eb5ac8af7f075610ae85cdbed5da
     <td width=400> </td>
   </tr>
   <tr>
     <td>  비밀번호 확인 </td>
-<<<<<<< HEAD
     <td> <ASP:TextBox class="form-control" id="txtPassCheck" textmode="password" runat="server" /> </td>
     <td> <ASP:Button class="btn btn-success" id="btnPassCheck" runat="server" text="비밀번호 체크" OnClick="btnPassCheck_Click"/>
       <ASP:Label id="lblPassCheckResult" runat="server"/> </td>
   </tr>
   <tr>
-    <td>  이름은 </td>
+    <td>  이름 </td>
     <td> <ASP:TextBox class="form-control" id="txtNick" runat="server" /> </td>
   </tr>
   <tr>
-    <td>  직책은  </td>
+    <td>  직책  </td>
     <td> <ASP:DropDownList class="form-control" id="DropDownList1" runat="server"> 
-=======
-    <td> <ASP:TextBox id="txtPassCheck" textmode="password" runat="server" /> </td>
-    <td> <ASP:Button id="btnPassCheck" runat="server" text="비밀번호 체크" OnClick="btnPassCheck_Click"/>
-      <ASP:Label id="lblPassCheckResult" runat="server"/> </td>
-  </tr>
-  <tr>
-    <td> 이름은 </td>
-    <td> <ASP:TextBox id="txtNick" runat="server" /> </td>
-  </tr>
-  <tr>
-    <td> 직책은 </td>
-    <td> <ASP:DropDownList id="DropDownList1" runat="server"> 
->>>>>>> 98bf81b08597eb5ac8af7f075610ae85cdbed5da
       <asp:ListItem Value="Manger">운영자</asp:ListItem>
       <asp:ListItem Value="PD">개발자</asp:ListItem>
       <asp:ListItem Value="teacher">학교관계자</asp:ListItem>
@@ -255,30 +234,22 @@ void btnPassCheck_Click(object sender, EventArgs e)
     </td>                
   </tr>
   <tr>
-<<<<<<< HEAD
     <td>  전화번호  </td>
     <td> <ASP:TextBox class="form-control" id="txtTelnum" runat="server" /> </td>
-=======
-    <td> 전화번호 </td>
-    <td> <ASP:TextBox id="txtTelnum" runat="server" /> </td>
->>>>>>> 98bf81b08597eb5ac8af7f075610ae85cdbed5da
   </tr>
 
 </table>  
 
 
   <br>
-<<<<<<< HEAD
   <ASP:Button class="btn btn-info" id="btnJoin" runat="server" text="회원가입 완료" OnClick="btnJoin_Click" />
-=======
-  <ASP:Button id="btnJoin" runat="server" text="회원가입 완료" OnClick="btnJoin_Click" />
->>>>>>> 98bf81b08597eb5ac8af7f075610ae85cdbed5da
   
   <br>
   <ASP:Label id="lblJoinResult" runat="server" text = "" />
 
   <br>
-  <ASP:DataGrid id="dg1" runat="server" />
+
+  <ASP:Button class="btn btn-info" id="btnGotoLogin" runat="server" text="로그인하러 가기" OnClick="btnGotoLogin_Click" />
 
 </center>
 </form>

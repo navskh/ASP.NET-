@@ -1,8 +1,8 @@
 <div id="footer">
 <hr color="slategray">
 
-이 홈페이지는 무단 복사 허용!
+이 홈페이지는 PIMS 요청사항 접수 게시판입니다.
 <br>
-주인장 메일 <font color="blue">navskh@naver.com</font> 에용!
+관련 문의는 메일 <font color="blue">navskh@naver.com</font> 입니다.
 
 </div>

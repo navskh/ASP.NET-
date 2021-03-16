@@ -241,7 +241,7 @@ table {
 }
 
 .table-link {
-  color : #343a40;
+  color : currentColor;
   font-weight : bold;
 }
 
@@ -1715,6 +1715,11 @@ pre code {
   border-top: 1px solid #dee2e6;
 }
 
+#FreeTextBox1_toolbarArea td
+{
+  padding: 0;
+}
+
 .table thead th {
   vertical-align: bottom;
   border-bottom: 2px solid #dee2e6;
@@ -1901,7 +1906,7 @@ pre code {
 .table-light td,
 .table-light thead th,
 .table-light tbody + tbody {
-  border-color: #f5f7f8;
+  border-color: black;
 }
 
 .table-hover .table-light:hover {

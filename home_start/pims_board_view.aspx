@@ -41,23 +41,52 @@
       DataTable dtView = BOARD_LIB.Read_PIMS(CATEGORY_ID, BOARD_ID);
       DataRow row = dtView.Rows[0];
 
+      Board BOARD_USER = new Board();
+
+      string user_type = "";
+
+      if (Session["login_id"] == null)
+      {
+        user_type = "none";
+      }
+
+      else
+      {
+        DataTable dtUser = BOARD_USER.Read_User((string)Session["login_id"]);
+        DataRow user = dtUser.Rows[0];
+        user_type = (string)user["user_type"];
+      }
       
+      if(user_type == "Manger")
+      {
+        lblcondition.Visible = true;
+        lblcondition.Text = (string)row["condition"];
+        contentCondition.Visible = false;
+      }
+      else if(user_type == "PD")
+      {
+        lblcondition.Visible = false;
+        //lblcondition.Text = (string)row["condition"];
+        contentCondition.Visible = true;
+      }
+      else
+      {
+        lblcondition.Visible = true;
+        lblcondition.Text = (string)row["condition"];
+        contentCondition.Visible = false;
+      }
+
+      lblServiceID.Text = (string)row["UnivServiceID"];
+      lblServiceName.Text = (string)row["ServiceName"];
+      lblDeveloper.Text = (string)row["DeveloperID"];
 
       lblTitle.Text = (string)row["title"];
+      lblDueDate.Text = (string)row["Due_Date"];
+      lblBoard_Type.Text = (string)row["Board_Type"];
+
       lblName.Text = String.Format("{0} ({1})", row["user_name"], row["regdate"]);
-      lblRead.Text = row["readnum"].ToString();
-      lblRecommend.Text = row["recommend"].ToString();
       lblContent.Text = (string)row["content"];
       
-
-      RecommendFlag = BOARD_LIB.RecommendCheck((string)Session["login_id"],BOARD_ID); 
-      if(RecommendFlag == 1){
-        btnRecommend.Text = "추천취소";
-      }
-      else btnRecommend.Text = "추천하기";
-    
-
-
       if ((string)row["file_attach"] != "")
         lblFile.Text = String.Format("<a href='upload/{0}'>{1}</a>", row["file_attach"], row["file_attach"]);
 
@@ -67,15 +96,67 @@
       if (!IsPostBack)
       {
         CommentList();
-        BOARD_LIB.ReadUp(CATEGORY_ID, BOARD_ID);
-
-        lblRead.Text = (Int32.Parse(lblRead.Text)+1).ToString(); // 처음 열었을 때 조회수 맞춰줌.
 
         // 수정, 삭제 기능 활성화 체크
         if(!String.IsNullOrEmpty((string)Session["login_id"])){
           if((string)Session["login_id"] == "admin" ||(string)Session["login_id"] == (string)row["user_id"])
           {
             trModifyDelete.Visible = true;
+          }
+        }
+
+        if((string)row["condition"] == "접수")
+        {
+          if(user_type == "Manger")
+          {
+            lblcondition.Visible = true;
+            lblcondition.Text = (string)row["condition"];
+            contentCondition.Visible = false;
+          }
+          else if(user_type == "PD")
+          {
+            lblcondition.Visible = false;
+            //lblcondition.Text = (string)row["condition"];
+            contentCondition.Visible = true;
+          }
+          else
+          {
+            lblcondition.Visible = true;
+            lblcondition.Text = (string)row["condition"];
+            contentCondition.Visible = false;
+          }
+        }
+
+        else
+        {
+          if((string)Session["login_nick"] == lblDeveloper.Text) 
+          {
+            this.contentCondition.Items[0].Enabled = false;
+            this.contentCondition.Items[1].Enabled = true;
+            this.contentCondition.Items[2].Enabled = true;
+            this.contentCondition.Items[3].Enabled = true;
+            this.contentCondition.Items[4].Enabled = true;
+
+            switch((string)row["condition"]){
+              case "처리중":             
+                this.contentCondition.SelectedIndex = 1;
+                break;
+              case "완료":             
+                this.contentCondition.SelectedIndex = 2;
+                break;
+              case "지연":             
+                this.contentCondition.SelectedIndex = 3;
+                break;
+              case "불가":             
+                this.contentCondition.SelectedIndex = 4;
+                break;
+            }    
+          }
+          else
+          {
+            lblcondition.Visible = true;
+            lblcondition.Text = (string)row["condition"];
+            contentCondition.Visible = false;
           }
         }
       }
@@ -123,28 +204,7 @@
       lblCommentCount.Text = "<b>총" + ((DataTable)rptComment.DataSource).Rows.Count + "개의 댓글이 있습니다. </b>";
 	}
 
-  void btnRecommend_Click(object sender, EventArgs e)
-  {
-    if (Session["login_id"] == null)
-    {
-      string alert_str = "<script language=JavaScript> alert('추천하고 싶으면 로그인 먼저 하고 와');" +"</"+ "script>";
-      ClientScript.RegisterStartupScript(typeof(Page), "alert", alert_str);
-    }
 
-    else
-    {
-      Board BOARD_LIB = new Board();
-      if(RecommendFlag == 0){ // 이전에 추천을 한적이 없다.
-        BOARD_LIB.Recommend((string)Session["login_id"],CATEGORY_ID, BOARD_ID);
-        Page_Load();
-      }
-      else{ // 이전에 추천을 한적이 있다.
-        BOARD_LIB.RecommendMinus((string)Session["login_id"],CATEGORY_ID, BOARD_ID);
-        Page_Load();
-      }
-    }
-
-  }
 
   void btnModify_Click(object sender, EventArgs e)
   {
@@ -155,7 +215,7 @@
   void btnDelete_Click(object sender, EventArgs e)
   {
     Board BOARD_LIB = new Board();
-    BOARD_LIB.Remove(CATEGORY_ID, BOARD_ID);
+    BOARD_LIB.Remove_PIMS(CATEGORY_ID, BOARD_ID);
 
     Response.Redirect(String.Format("board_list.aspx?c={0}",CATEGORY_ID));
   }
@@ -163,6 +223,66 @@
   void btnList_Click(object sender, EventArgs e)
   {
     Response.Redirect(String.Format("board_list.aspx?c={0}&stype={1}&svalue={2}",CATEGORY_ID,Request["stype"],Request["svalue"]));
+  }
+
+  void condition_change(object sender, EventArgs e)
+  {
+    if(this.contentCondition.SelectedValue == "inprogress")
+    { 
+      Board BOARD_LIB = new Board();
+      
+      string alert_str = "<script language=JavaScript> alert('요청을 처리하시겠습니까?');" +"</"+ "script>";
+      ClientScript.RegisterStartupScript(typeof(Page), "alert", alert_str);   
+      lblDeveloper.Text = (string)Session["login_nick"];
+      BOARD_LIB.Update_condition(lblDeveloper.Text, "처리중", BOARD_ID);
+
+      this.contentCondition.Items[0].Enabled = false;
+      this.contentCondition.Items[1].Enabled = true;
+      this.contentCondition.Items[2].Enabled = true;
+      this.contentCondition.Items[3].Enabled = true;
+      this.contentCondition.Items[4].Enabled = true;
+    }
+    else if(this.contentCondition.SelectedValue == "finish")
+    {
+      Board BOARD_LIB = new Board();
+      BOARD_LIB.Update_condition(lblDeveloper.Text, "완료", BOARD_ID);
+
+      this.contentCondition.Items[0].Enabled = false;
+      this.contentCondition.Items[1].Enabled = true;
+      this.contentCondition.Items[2].Enabled = true;
+      this.contentCondition.Items[3].Enabled = true;
+      this.contentCondition.Items[4].Enabled = true;
+
+      this.contentCondition.SelectedIndex = 2;
+    }
+
+    else if(this.contentCondition.SelectedValue == "cannot")
+    {
+      Board BOARD_LIB = new Board();
+      BOARD_LIB.Update_condition(lblDeveloper.Text, "불가", BOARD_ID);
+
+      this.contentCondition.Items[0].Enabled = false;
+      this.contentCondition.Items[1].Enabled = true;
+      this.contentCondition.Items[2].Enabled = true;
+      this.contentCondition.Items[3].Enabled = true;
+      this.contentCondition.Items[4].Enabled = true;
+
+      this.contentCondition.SelectedIndex = 4;
+    }
+    
+    else if(this.contentCondition.SelectedValue == "delay")
+    {
+      Board BOARD_LIB = new Board();
+      BOARD_LIB.Update_condition(lblDeveloper.Text, "지연", BOARD_ID);
+
+      this.contentCondition.Items[0].Enabled = false;
+      this.contentCondition.Items[1].Enabled = true;
+      this.contentCondition.Items[2].Enabled = true;
+      this.contentCondition.Items[3].Enabled = true;
+      this.contentCondition.Items[4].Enabled = true;
+
+      this.contentCondition.SelectedIndex = 3;
+    }
   }
 </script>
 
@@ -173,49 +293,73 @@
 <form runat="server">
 <br><br>
 <center>
-  <h2>게시글 확인!</h2>
+  <h2> <b> 요청사항 확인 </b> </h2>
+
   <br>
 
-  <table>
-    <tr>
-      <th>  제목 : </th>
-      <th> <ASP:Label id="lblTitle" runat="server" /> </th>
-      <td width=100> </td>
-      <td> 작성: </td>
-      <td> <ASP:Label id="lblName" runat="server" /></td>
-      <td width=100> </td>
-      <td>조회수 : </td>
-      <td> <ASP:Label id="lblRead" runat="server" /> </td>
-      <td width=30> </td>
-      <td> 추천 : </td>
-      <td> <ASP:Label id="lblRecommend" runat="server" /></td>
-    </tr>
-    
-    <tr class="table table-hover">
-      <th class="table-primary" colspan="3"  height="300" width="231.81">  내용 </th>
-      <td class="table-light" colspan="8" width="675.46"> <ASP:Label id="lblContent" runat="server" style="word-wrap:break-word; white-space: pre-line; table-layout: fixed;" /></td>
-    </tr>
+<table class="table">
+  <tr> 
+    <td class="table-primary">이름(작성일자) </td>
+    <td colspan="8"> <ASP:Label id="lblName" runat="server" /> </td>
+  </tr>
 
-    <tr>
-      <td colspan="3"> 첨부파일 : <ASP:Label id="lblFile" runat="server" /> </td>
-      <td colspan="5" id="trModifyDelete" visible="false" runat="server" align="right"> 
+  <tr>
+    <td class="table-primary"> 서비스 명 </td>
+    <td > <ASP:Label id="lblServiceName" runat="server" /> </td>
+
+    <td class="table-primary"> 서비스ID </td>
+    <td > <ASP:Label id="lblServiceID" runat="server" /> </td>
+
+    <td class="table-primary"> 개발 담당자 </td>
+    <td > <ASP:Label id="lblDeveloper" runat="server"/> </td>
+
+    <td class="table-primary"> 요청상태 </td>
+    <td> 
+      <ASP:Label id="lblcondition" runat="server" />
+      <ASP:DropDownList class="form-control2" id="contentCondition" OnSelectedIndexChanged="condition_change" AutoPostBack="true" runat="server">
+        <ASP:ListItem Value="ready" text="접수" />
+        <ASP:ListItem Value="inprogress" text="처리중" /> 
+        <ASP:ListItem Value="finish" Enabled="false" text="완료" /> 
+        <ASP:ListItem Value="delay"  Enabled="false" text="지연" /> 
+        <ASP:ListItem Value="cannot" Enabled="false" text="불가" />  
+      </ASP:DropDownList>
+    </td>
+  </tr>
+
+  <tr>
+    <td class="table-primary" > 제목 </td>
+    <td colspan="3"> <ASP:Label id="lblTitle" runat="server" /> </td>
+    <td class="table-primary"> 요청기한 </td>
+    <td> <ASP:Label id="lblDueDate" runat="server" /> </td>
+    <td class="table-primary"> 대분류 </td>
+    <td> <ASP:Label id="lblBoard_Type" runat="server" /> </td>
+  </tr>
+
+  <tr> 
+    <td class="table-primary"> 내용 </td>
+    <td class="table-light" colspan="8" width="675.46"> 
+      <ASP:Label id="lblContent" runat="server" style="word-wrap:break-word; white-space: pre-line; table-layout: fixed;" />
+    </td>
+  </tr>
+
+  <tr>
+    <td class="table-primary"> 첨부파일 </td>
+    <td  colspan="7"> <ASP:Label id="lblFile" runat="server" /> </td>
+  </tr>
+  <tr id="trModifyDelete" runat="server">
+    <td colspan="8" visible="false" runat="server" align="right"> 
+        <ASP:Label id="lblError" runat="server" Text="" />
         <ASP:Button class="btn btn-success" id="btnModify" text="수정하기" onClick="btnModify_Click" runat="server" />
         <ASP:Button class="btn btn-danger" id="btnDelete" text="삭제하기" onClick="btnDelete_Click" runat="server" />
-      </td>
-      <td colspan="3" style="padding: 0 0 0 4px">
-      <ASP:Button margin-left="auto" class="btn btn-info" id="btnRecommend" text="추천하기" onclick="btnRecommend_Click" runat="server" />
-    </tr>
-    
-  </table>
-
+    </td>
+  </tr>
+</table>
   
 </center>
 
-
-
 <!---------------- 댓글 목록 ------------------->
 <center>
-<table border-top="3px solid #dee2e6">
+<table class="table" border-top="3px solid #dee2e6">
   <tr>
     <td colspan="2" align="center">
       <ASP:Label id="lblCommentCount" runat="server" />
@@ -225,13 +369,13 @@
   <ASP:Repeater id="rptComment" runat="server">
   <ItemTemplate>
     <tr height="80">
-      <th class="table-success" style="padding:0 0 0 10" width="231.81">
+      <th class="table-success" width="216">
         <%# Eval("user_name") %>
         <br>
         <font size="1"> <%# Eval("regdate") %> </font>
       </td>
       
-      <td class="table-light" width="675.46">
+      <td class="table-light">
         <font style="word-wrap:break-word; white-space: pre-line; table-layout: fixed;"> <%# Eval("content") %> </font>
       </td>
     </tr>
@@ -239,19 +383,25 @@
   </ItemTemplate>
   </ASP:Repeater>
   </table>  
-
+  </center>
 
 
 <!--------------- 댓글쓰기 -------------------->
   <br>
-  <table id="tblCommentWrite" runat="server">
+  <center>
+  <table class="table" id="tblCommentWrite" runat="server">
   <tr>
-    <th class="table-info" width="231.81" style="padding:0 0 0 10">
+    <th>
+      <h3><b> 댓글작성 </b> </h3>
+    </th>
+  </tr>
+  <tr>
+    <th class="table-info" width="216">
       <ASP:Label id="lblWriter" runat="server" />
     </th>
 
-      <td width="675.46">
-      <ASP:TextBox class="form-control" id="txtComment" textmode="multiline" width="675.46" height="200" runat="server" />
+      <td>
+      <ASP:TextBox class="form-control2" id="txtComment" textmode="multiline" height="200" runat="server" />
       </td>
   </tr>
   <tr>

@@ -37,6 +37,18 @@ void loginproc()
       // 세션변수 2개 할당
       Session["login_id"] = id;
       Session["login_nick"] = dtMember.Rows[0]["nickname"];
+      string user_type = (string)dtMember.Rows[0]["user_type"];
+      
+      if(user_type == "PD"){
+        Session["user_type"] = "개발자";
+      }
+      else if(user_type == "Manger"){
+        Session["user_type"] = "운영자";
+      }
+      else{
+        Session["user_type"] = "미등록";
+      }
+
 
       message = String.Format("{0}({1}) 회원님. 로그인이 성공하였습니다~", Session["login_id"], Session["login_nick"]); 
 
@@ -55,8 +67,6 @@ void loginproc()
 
 <INCLUDE:TOP runat="server" />
 <!-- ----------------------------------여기서부터 내용 ---------->
-
-
 
 <div id="content">
 <center>

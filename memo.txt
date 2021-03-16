@@ -95,3 +95,71 @@
 4. 페이지 배포 방법
   * 기초데이터 배포 (db배포)
   * script 실행 (프로시저 수정, 배포)
+
+
+
+- CHEditor  5.1.9.3  (2016.11.22)
+http://www.chcode.com/products/cheditor.shtml
+프로그램 : ASP ,  ASP.NET ,  PHP
+브라우저 : FireFox 2.x ~ 3.x   /   Intetnet Explorer 5.5 ~ 7.x
+라이센스 : GNU
+가격 : 도메인 라이센스: 330,000원 ,  재배포 라이센스 : 2,200,000원
+특징 :
+  . 이미지 : 링크, 업로드 지원
+  . 파일첨부 : 불가능
+  . 솔루션 : 그누보드4
+
+
+- CKeditor  4.6.1  (2016.??.??)
+http://ckeditor.com/download
+프로그램 : ASP ,  ASP.NET,  Perl ,  PHP
+브라우저 : FireFox 2.x ~ 3.x   /   Intetnet Explorer 5.5 ~ 7.x
+라이센스 : Open Source Licenses (GPL)
+가격 : Free
+특징 :
+  . 이미지 : 링크, 업로드 지원
+  . 파일첨부 : 불가능
+  . 다국어 : 지원
+  . 솔루션 : 그누보드5beta
+
+- CKeditor Premium 4.3  (2016.??.??)
+http://cksource.com/ckeditor/
+프로그램 : ASP ,  ASP.NET,  Perl ,  PHP
+브라우저 : FireFox 2.x ~ 3.x   /   Intetnet Explorer 5.5 ~ 7.x
+가격 : $99/usd (1개 웹사이트)
+특징 :
+  . 이미지 : 링크, 업로드 지원
+  . 파일첨부 : 불가능
+  . 다국어 : 지원
+
+- 덱스트 웹에디터 ( DEXTWebEditor )  2.5.809.110  (20??.??.??)
+http://www.dextsolution.com/
+프로그램 : ASP  < ActiveX 설치 >
+브라우저 : Intetnet Explorer 5.5 ~ 7.x
+라이센스 : 상용
+가격 : 1,122,000원
+특징 :
+  . 이미지 : 링크, 업로드 지원
+  . ActiveX 설치되어야만 사용가능
+  . FireFox에서 사용 불가능
+  . 모바일지원 : ?
+
+- openWYSIWYG  1.4.7  (2007.09.08)
+http://www.openwebware.com/download
+프로그램 : ASP ,  C/C++ ,  C# ,  JSP ,  Perl ,  PHP
+브라우저 : FireFox 2.x ~ 3.x   /   Intetnet Explorer 5.5 ~ 7.x
+라이센스 : GNU
+특징 :
+  . 이미지 : 링크지원, 업로드 불가능
+  . 파일첨부 : 불가능
+
+- SmartEditor  2.9.0   (2016.12.16)
+https://github.com/naver/smarteditor2
+프로그램 : 
+브라우저 : 
+라이센스 : GNU
+가격 : Free
+특징 :
+  . 이미지 : 링크, 업로드 지원
+  . 파일첨부 : 불가능
+  . 솔루션 : 그누보드5, XepressEngine

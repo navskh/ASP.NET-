@@ -3,6 +3,11 @@
 <%@ Register TagPrefix="INCLUDE" TagName="BOTTOM" src="bottom.ascx" %>
 <%@ Import Namespace = "Study" %>
 
+<%@ Page Language="C#" validateRequest="false" %>
+<%@ Register TagPrefix="FTB" Namespace="FreeTextBoxControls" Assembly="FreeTextBox" %>
+
+
+
 <%@ Import Namespace = "System.Drawing" %>
 <%@ Import Namespace = "System.Drawing.Imaging" %>
 
@@ -25,16 +30,26 @@ void Page_Load(){
 
     if(!IsPostBack)
     {
+
       // 데이터 가져오기
     string CATEGORY_ID = Request["c"];
     int BOARD_ID = Int32.Parse(Request["n"]);
 
     Board BOARD_LIB = new Board();
-    System.Data.DataTable dtModify = BOARD_LIB.Read(CATEGORY_ID,BOARD_ID);
+    System.Data.DataTable dtModify = BOARD_LIB.Read_PIMS(CATEGORY_ID,BOARD_ID);
 
     //텍스트 박스에 넣어주기
+
     txtTitle.Text = (string)dtModify.Rows[0]["title"];
-    txtContent.Text = (string)dtModify.Rows[0]["content"];
+    FreeTextBox1.Text = (string)dtModify.Rows[0]["content"];
+    txtServiceID.Text = (string)dtModify.Rows[0]["UnivServiceID"];
+    txtServiceName.Text = (string)dtModify.Rows[0]["ServiceName"];
+    
+    if((string)dtModify.Rows[0]["Due_Date"] == "최상") listDue_Date.SelectedIndex = 0;
+    else if((string)dtModify.Rows[0]["Due_Date"] == "높음") listDue_Date.SelectedIndex = 1;
+    else if((string)dtModify.Rows[0]["Due_Date"] == "중간") listDue_Date.SelectedIndex = 2;
+    else if((string)dtModify.Rows[0]["Due_Date"] == "낮음") listDue_Date.SelectedIndex = 3;
+    else listDue_Date.SelectedIndex = 0;
 
     //파일 첨부체크, 첨부가 없으면 컬럼값은 공백("")이다.
     if((string)dtModify.Rows[0]["file_attach"] != "")
@@ -58,12 +73,11 @@ void Page_Load(){
 void btnWrite_Click(object sender, EventArgs e)
 {
   string title = txtTitle.Text.Trim();
-  string content = txtContent.Text.Trim();
+  string content = FreeTextBox1.Text.Trim();
   string ServiceID = txtServiceID.Text.Trim();
   string ServiceName = txtServiceName.Text.Trim();
-  string Developer = DeveloperList.SelectedValue;
   string type = Board_Type.SelectedValue;
-  string Due_Date = txtDueDate.Text.Trim();
+  string Due_Date = listDue_Date.SelectedValue;
 
   string message = "";  
   bool IsChecked = true;
@@ -120,10 +134,6 @@ void btnWrite_Click(object sender, EventArgs e)
       img_newsize.Dispose();
       g.Dispose();
       //섬네일 만들기 끝
-<<<<<<< HEAD
-=======
-
->>>>>>> 98bf81b08597eb5ac8af7f075610ae85cdbed5da
     }
 
     // -------[수정 모드 추가]--------
@@ -148,11 +158,12 @@ void btnWrite_Click(object sender, EventArgs e)
     // 수정 모드 추가
     if(IsEditMode){
       // 수정기능
-      BOARD_LIB.Modify(Int32.Parse(Request["n"]), title, content, upload_file);
+      BOARD_LIB.Modify_PIMS(Int32.Parse(Request["n"]), ServiceName, ServiceID, "미정", Due_Date,
+      title, type, content, upload_file);
 
       // 이후 글보기로 바로 이동
     Response.Redirect(
-      "board_view.aspx?c=" + Request["c"] + "&n=" + Request["n"] + "&page=" + Request["page"]
+      "pims_board_view.aspx?c=" + Request["c"] + "&n=" + Request["n"] + "&page=" + Request["page"]
       + "&stype=" + Request["stype"] + "&svalue=" + Request["svalue"]
       );
     }
@@ -161,7 +172,8 @@ void btnWrite_Click(object sender, EventArgs e)
     //BOARD_LIB.Write(category, user_id, user_name, title, content, upload_file);
 
     //Pims 글쓰기
-    BOARD_LIB.Write_PIMS(category, ServiceName, ServiceID, Developer, Due_Date, user_id, user_name, title, type, content, upload_file);
+    BOARD_LIB.Write_PIMS(category, ServiceName, ServiceID, "미정", Due_Date,
+    user_id, user_name, title, type, content, upload_file);
 
     // 이후 리스트로 바로 이동 ('c' 값은 계속 유지)
     Response.Redirect("board_list.aspx?c=" + Request["c"]);
@@ -174,7 +186,6 @@ void btnWrite_Click(object sender, EventArgs e)
     // IsChecked 가 false 이면 오류. 메시지만 뿌리자.
     lblError.Text = message;
   }
-
   
 }
 
@@ -188,8 +199,6 @@ void btnList_Click(object sender, EventArgs e)
 <INCLUDE:TOP runat="server" />
 <BOARD:TOP runat="server" />
 <!-- ----------------------------------여기서부터 내용 ---------->
-
-
 
 <div id="content">
 
@@ -213,29 +222,27 @@ void btnList_Click(object sender, EventArgs e)
 
     <td class="table-primary"> 개발 담당자 </td>
     <td > 
-      <ASP:DropDownList class="form-control2" id="DeveloperList" runat="server">
-        <ASP:ListItem value="PD1" text="개발자1" />
-        <ASP:ListItem value="PD2" text="개발자2" /> 
-      </ASP:DropDownList>
+      <h5> 미정 </h5>
     </td>
 
     <td class="table-primary"> 글 상태 </td>
     <td > 
-      <ASP:DropDownList class="form-control2" id="contentCondition" runat="server">
-        <ASP:ListItem value="ready" text="접수" />
-        <ASP:ListItem value="inprogress" text="처리중" /> 
-        <ASP:ListItem value="finish" text="완료" /> 
-        <ASP:ListItem value="delay" text="지연" /> 
-        <ASP:ListItem value="cannot" text="불가" /> 
-      </ASP:DropDownList>
+      <h5> 접수 </h5>
     </td>
   </tr>
 
   <tr>
     <td class="table-primary" > 제목 </td>
     <td colspan="3"> <ASP:TextBox class="form-control2" placeholder="제목을 입력해주세요" id="txtTitle" runat="server" /> </td>
-    <td class="table-primary"> 요청기한 </td>
-    <td> <ASP:TextBox class="form-control2" placeholder="요청기한을 입력해주세요" id="txtDueDate" runat="server" /> </td>
+    <td class="table-primary"> 우선순위 </td>
+    <td> 
+      <ASP:DropDownList class="form-control2" id="listDue_Date" runat="server">
+        <ASP:ListItem value="최상" text="최상" />
+        <ASP:ListItem value="높음" text="높음" /> 
+        <ASP:ListItem value="중간" text="중간" /> 
+        <ASP:ListItem value="낮음" text="낮음" /> 
+      </ASP:DropDownList>
+    </td>
     <td class="table-primary"> 대분류 </td>
     <td >
       <ASP:DropDownList class="form-control2" id="Board_Type" runat="server">
@@ -248,11 +255,24 @@ void btnList_Click(object sender, EventArgs e)
     </td>
   </tr>
 
-  <tr> 
+  <tr>
     <td class="table-primary"> 내용 </td>
-    <td  colspan="8" height="10"> <ASP:TextBox id="txtContent" textmode="Multiline" placeholder="내용을 입력하세요" 
-    class="form-control2" runat="server" Columns="90" Rows="10"/> 
+    
+    <td colspan="8">
+        <FTB:FreeTextBox id="FreeTextBox1" width="1200px"
+        Focus="true"
+        SupportFolder="~/aspnet_client/FreeTextBox/"
+        JavaScriptLocation="ExternalFile" 
+        ButtonImagesLocation="ExternalFile"
+        ToolbarImagesLocation="ExternalFile"
+        ToolbarStyleConfiguration="OfficeMac"			
+        toolbarlayout="ParagraphMenu,FontFacesMenu,FontSizesMenu,FontForeColorsMenu,FontForeColorPicker,FontBackColorsMenu,FontBackColorPicker,Bold,Italic,Underline,Strikethrough,JustifyLeft,JustifyRight,JustifyCenter,JustifyFull,BulletedList,NumberedList,Indent,Outdent,CreateLink,Unlink,InsertImage,Cut,Copy,Paste,Delete;Undo,Redo,Print,Save,InsertTable,InsertImageFromGallery,SymbolsMenu"
+        runat="Server"
+        GutterBackColor="red"
+        DesignModeCss="designmode.css"		 
+        />
     </td>
+    
   </tr>
 
   <tr>
@@ -280,8 +300,8 @@ void btnList_Click(object sender, EventArgs e)
 <input type="hidden" id="hdnFile" runat="server" />
 
 </form>
+
 </center>
 </div>
-
 <!-- ----------------------------------내용 끝 ---------->
 <INCLUDE:BOTTOM runat="server" />
