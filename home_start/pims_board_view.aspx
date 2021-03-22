@@ -2,6 +2,7 @@
 <%@ Register TagPrefix="BOARD" TagName="TOP" src="board_top.ascx" %>
 
 <%@ Register TagPrefix="INCLUDE" TagName="BOTTOM" src="bottom.ascx" %>
+<%@ Page Language="C#" Debug="true" %>
 <%@ Import Namespace = "Study" %>
 <%@ Import Namespace = "System.Data" %>
 
@@ -31,8 +32,8 @@
         tblCommentWrite.Visible = false;
       //로그인 되었으면 작성자 Label 넣기
       else 
-      lblWriter.Text = (string)Session["login_nick"];
-      
+      lblWriter.Text = (string)Session["login_nick"] + 
+      "(" + (string)Session["user_type"] + ")";
       
       
       CATEGORY_ID = Request["c"];
@@ -96,7 +97,6 @@
       if (!IsPostBack)
       {
         CommentList();
-
         // 수정, 삭제 기능 활성화 체크
         if(!String.IsNullOrEmpty((string)Session["login_id"])){
           if((string)Session["login_id"] == "admin" ||(string)Session["login_id"] == (string)row["user_id"])
@@ -222,7 +222,9 @@
   
   void btnList_Click(object sender, EventArgs e)
   {
-    Response.Redirect(String.Format("board_list.aspx?c={0}&stype={1}&svalue={2}",CATEGORY_ID,Request["stype"],Request["svalue"]));
+//    Response.Redirect(String.Format("board_list.aspx?c={0}&stype={1}&svalue={2}",CATEGORY_ID,Request["stype"],Request["svalue"]));
+    Response.Redirect(String.Format("board_list.aspx?c={0}&page={1}&stype={2}&svalue={3}",
+          CATEGORY_ID, NOW_PAGE, Request["stype"], Request["svalue"]));
   }
 
   void condition_change(object sender, EventArgs e)
@@ -231,7 +233,7 @@
     { 
       Board BOARD_LIB = new Board();
       
-      string alert_str = "<script language=JavaScript> alert('요청을 처리하시겠습니까?');" +"</"+ "script>";
+      string alert_str = "<script language=JavaScript> alert('요청을 처리합니다.');" +"</"+ "script>";
       ClientScript.RegisterStartupScript(typeof(Page), "alert", alert_str);   
       lblDeveloper.Text = (string)Session["login_nick"];
       BOARD_LIB.Update_condition(lblDeveloper.Text, "처리중", BOARD_ID);
@@ -284,6 +286,31 @@
       this.contentCondition.SelectedIndex = 3;
     }
   }
+
+  void rptComment_Bound(object sender, RepeaterItemEventArgs e)
+  {
+    string user_type = ((Label)e.Item.FindControl("lblUserType")).Text;
+    string TH_open = "";
+
+    if(user_type == "Manger")
+    {
+      user_type = "(운영자)";
+      TH_open = "<th class = table-warning width=216>";
+    }
+    else if(user_type == "PD")
+    {
+      user_type = "(개발자)";
+      TH_open = "<th class = table-info width=216>";
+    }
+    else
+    {
+      user_type = "(미정)";
+      TH_open = "<th class = table-light width=216>";
+    }
+
+    ((Label)e.Item.FindControl("lblUserType")).Text = user_type;
+    ((Label)e.Item.FindControl("lblTH_Open")).Text = TH_open;
+  }
 </script>
 
 <INCLUDE:TOP runat="server" />
@@ -329,7 +356,7 @@
   <tr>
     <td class="table-primary" > 제목 </td>
     <td colspan="3"> <ASP:Label id="lblTitle" runat="server" /> </td>
-    <td class="table-primary"> 요청기한 </td>
+    <td class="table-primary"> 우선순위 </td>
     <td> <ASP:Label id="lblDueDate" runat="server" /> </td>
     <td class="table-primary"> 대분류 </td>
     <td> <ASP:Label id="lblBoard_Type" runat="server" /> </td>
@@ -346,8 +373,8 @@
     <td class="table-primary"> 첨부파일 </td>
     <td  colspan="7"> <ASP:Label id="lblFile" runat="server" /> </td>
   </tr>
-  <tr id="trModifyDelete" runat="server">
-    <td colspan="8" visible="false" runat="server" align="right"> 
+  <tr>
+    <td colspan="8" id="trModifyDelete" visible="false" runat="server" align="right"> 
         <ASP:Label id="lblError" runat="server" Text="" />
         <ASP:Button class="btn btn-success" id="btnModify" text="수정하기" onClick="btnModify_Click" runat="server" />
         <ASP:Button class="btn btn-danger" id="btnDelete" text="삭제하기" onClick="btnDelete_Click" runat="server" />
@@ -366,16 +393,16 @@
     </td>
   </tr>
 
-  <ASP:Repeater id="rptComment" runat="server">
+  <ASP:Repeater id="rptComment" runat="server" OnItemDataBound="rptComment_Bound">
   <ItemTemplate>
     <tr height="80">
-      <th class="table-success" width="216">
-        <%# Eval("user_name") %>
+      <ASP:Label id="lblTH_Open" runat="server"/>
+        <%# Eval("user_name") %> <ASP:Label id="lblUserType" runat="server" Text=<%# Eval("user_type") %>/>
         <br>
         <font size="1"> <%# Eval("regdate") %> </font>
       </td>
       
-      <td class="table-light">
+      <td>
         <font style="word-wrap:break-word; white-space: pre-line; table-layout: fixed;"> <%# Eval("content") %> </font>
       </td>
     </tr>
@@ -391,18 +418,17 @@
   <center>
   <table class="table" id="tblCommentWrite" runat="server">
   <tr>
-    <th>
+    <th colspan="2">
       <h3><b> 댓글작성 </b> </h3>
     </th>
   </tr>
   <tr>
-    <th class="table-info" width="216">
+    <th class="table-success" width="216">
       <ASP:Label id="lblWriter" runat="server" />
     </th>
-
-      <td>
+    <td>
       <ASP:TextBox class="form-control2" id="txtComment" textmode="multiline" height="200" runat="server" />
-      </td>
+    </td>
   </tr>
   <tr>
       <td colspan="2" align="right">

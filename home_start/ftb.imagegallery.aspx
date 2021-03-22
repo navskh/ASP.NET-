@@ -1,8 +1,8 @@
 <%@ Page Language="C#" ValidateRequest=false Trace="false" %>
 <%@ Register TagPrefix="FTB" Namespace="FreeTextBoxControls" Assembly="FreeTextBox" %>
 <script runat="server">
-protected void Page_Load(Object Src, EventArgs E) {
-	
+protected void Page_Load(Object Src, EventArgs E) 
+{	
 	// *** remove this return statement to use the following code ***
 	return;
 
@@ -38,7 +38,9 @@ protected void Page_Load(Object Src, EventArgs E) {
 	}	
 	
 }
+
 </script>
+
 <html>
 <head>
 	<title>Image Gallery</title>

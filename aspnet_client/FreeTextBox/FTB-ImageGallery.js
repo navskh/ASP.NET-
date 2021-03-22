@@ -220,6 +220,7 @@ function FTB_UpdatePreview(sender) {
 		
 	}
 };
+
 function FTB_RestorePreview() {
 	previewImage = document.getElementById('img_preview');
 	previewImage.width = document.getElementById('img_previewWidth').value;

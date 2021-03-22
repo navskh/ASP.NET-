@@ -2,7 +2,7 @@
 <%@ Register TagPrefix="INCLUDE" TagName="BOTTOM" src="bottom.ascx" %>
 
 <script language="C#" runat="server">
-void Page_Load()
+void Page_Load() // 로그아웃 시 Session에 저장된 값들을 해제 함.
 {
   if (Session["login_id"] != null)
   {

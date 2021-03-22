@@ -4,6 +4,8 @@
 <%@ Register TagPrefix="INCLUDE" TagName="BOTTOM" src="bottom.ascx" %>
 <%@ Import Namespace = "Study" %>
 <%@ Import Namespace = "System.Data" %>
+<%@ Page Language="C#" Debug="true" %>
+
 
 <script language="C#" runat="server">
   string CATEGORY_ID;
@@ -39,26 +41,29 @@
       BOARD_ID = Int32.Parse(Request["n"]);
       Board BOARD_LIB = new Board();
 
+      DataTable dtView = new DataTable();
+
       if(CATEGORY_ID == "pims")
       {
-        DataTable dtView = BOARD_LIB.Read_PIMS(CATEGORY_ID, BOARD_ID);
+        dtView = BOARD_LIB.Read_PIMS(CATEGORY_ID, BOARD_ID);
       }
+
       else 
       {
-        //DataTable dtView = BOARD_LIB.Read(CATEGORY_ID, BOARD_ID);
+        dtView = BOARD_LIB.Read(CATEGORY_ID, BOARD_ID);
       }
 
       DataRow row = dtView.Rows[0];
 
-      
-
-      lblTitle.Text = (string)ㄹ["title"];
-      lblName.Text = String.Format("{0} ({1})", row["user_name"], row["regdate"]);
+      lblDateTime.Text = row["regdate"].ToString();
+      lblStudyType.Text = (string)row["StudyType"];
+      lblTitle.Text = (string)row["title"];
+      lblName.Text = (string)row["user_name"];
       
       
       if(CATEGORY_ID != "pims")
       {
-        //lblRead.Text = row["readnum"].ToString();
+        lblRead.Text = row["readnum"].ToString();
         lblRecommend.Text = row["recommend"].ToString();
       }
       
@@ -80,16 +85,17 @@
       // 처음 열었을 때
       if (!IsPostBack)
       {
-        //CommentList();
-        //BOARD_LIB.ReadUp(CATEGORY_ID, BOARD_ID);
+        CommentList();
+        BOARD_LIB.ReadUp(CATEGORY_ID, BOARD_ID);
 
-        //lblRead.Text = (Int32.Parse(lblRead.Text)+1).ToString(); // 처음 열었을 때 조회수 맞춰줌.
+        lblRead.Text = (Int32.Parse(lblRead.Text)+1).ToString(); // 처음 열었을 때 조회수 맞춰줌.
 
         // 수정, 삭제 기능 활성화 체크
         if(!String.IsNullOrEmpty((string)Session["login_id"])){
           if((string)Session["login_id"] == "admin" ||(string)Session["login_id"] == (string)row["user_id"])
           {
-            trModifyDelete.Visible = true;
+            btnModify.Visible = true;
+            btnDelete.Visible = true;
           }
         }
       }
@@ -162,7 +168,7 @@
 
   void btnModify_Click(object sender, EventArgs e)
   {
-    Response.Redirect(String.Format("board_write.aspx?c={0}&n={1}&page={2}&stype={3}&svalue={4}",
+    Response.Redirect(String.Format("board_write_study.aspx?c={0}&n={1}&page={2}&stype={3}&svalue={4}",
           CATEGORY_ID, BOARD_ID, NOW_PAGE, Request["stype"], Request["svalue"]));
   }
 
@@ -187,59 +193,27 @@
 <form runat="server">
 <br><br>
 <center>
-  <h2>게시글 확인!</h2>
+
+  <h2> <b> 작성 내용 확인 </b> </h2>
 
   <br>
-
-<form runat="server">
 <table class="table">
   <tr> 
-    <td class="table-primary">이름(아이디) </td>
-    <td colspan="8"> <ASP:Label id="lblName" runat="server" /> </td>
-  </tr>
-
-  <tr>
-    <td class="table-primary"> 서비스 명 </td>
-    <td > <ASP:TextBox class="form-control2" placeholder="서비스명을 입력해주세요" id="txtServiceName" runat="server" /> </td>
-
-    <td class="table-primary"> 서비스ID </td>
-    <td > <ASP:TextBox class="form-control2" placeholder="서비스아이디를 입력해주세요" id="txtServiceID" runat="server" /> </td>
-
-    <td class="table-primary"> 개발 담당자 </td>
-    <td > 
-      <ASP:DropDownList class="form-control2" id="DeveloperList" runat="server">
-        <ASP:ListItem value="PD1" text="개발자1" />
-        <ASP:ListItem value="PD2" text="개발자2" /> 
-      </ASP:DropDownList>
-    </td>
-
-    <td class="table-primary"> 글 상태 </td>
-    <td > 
-      <ASP:DropDownList class="form-control2" id="contentCondition" runat="server">
-        <ASP:ListItem value="ready" text="접수" />
-        <ASP:ListItem value="inprogress" text="처리중" /> 
-        <ASP:ListItem value="finish" text="완료" /> 
-        <ASP:ListItem value="delay" text="지연" /> 
-        <ASP:ListItem value="cannot" text="불가" /> 
-      </ASP:DropDownList>
-    </td>
+    <td class="table-primary">날짜 </td>
+    <td> <ASP:Label id="lblDateTime" runat="server" /> </td>
+    <td class="table-primary"> 스터디 종류 </td>
+    <td > <ASP:Label id="lblStudyType" runat="server" /> </td>
+    <td class="table-primary"> 작성자 </td>
+    <td> <ASP:Label id="lblName" runat="server" /> </td>
   </tr>
 
   <tr>
     <td class="table-primary" > 제목 </td>
-    <td colspan="3"> <ASP:Label id="lblTitle" runat="server" /> </td>
-    <td class="table-primary"> 요청기한 </td>
-    <td> <ASP:TextBox class="form-control2" placeholder="요청기한을 입력해주세요" id="txtDueDate" runat="server" /> </td>
-    <td class="table-primary"> 대분류 </td>
-    <td >
-      <ASP:DropDownList class="form-control2" id="Board_Type" runat="server">
-        <ASP:ListItem value="board_type1" text="유형1" />
-        <ASP:ListItem value="board_type2" text="유형2" /> 
-        <ASP:ListItem value="board_type3" text="유형3" /> 
-        <ASP:ListItem value="board_type4" text="유형4" /> 
-        <ASP:ListItem value="board_type5" text="유형5" /> 
-      </ASP:DropDownList>
-    </td>
+    <td> <ASP:Label id="lblTitle" runat="server" /> </td>
+    <td class="table-primary"> 조회수 </td>
+    <td> <ASP:Label id="lblRead" runat="server" /> </td>
+    <td class="table-primary"> 추천수 </td>
+    <td > <ASP:Label id="lblRecommend" runat="server" /> </td>
   </tr>
 
   <tr> 
@@ -255,30 +229,21 @@
       <ASP:Label id="lblFile" runat="server" />
     </td>
   </tr>
-  <tr> </tr>
   <tr>
-    <td colspan="8" id="trModifyDelete" visible="false" runat="server" align="right"> 
+    <td colspan="6" runat="server" align="right"> 
         <ASP:Label id="lblError" runat="server" Text="" />
-        <ASP:Button class="btn btn-success" id="btnModify" text="수정하기" onClick="btnModify_Click" runat="server" />
-        <ASP:Button class="btn btn-danger" id="btnDelete" text="삭제하기" onClick="btnDelete_Click" runat="server" />
+        <ASP:Button visible="false" class="btn btn-success" id="btnModify" text="수정하기" onClick="btnModify_Click" runat="server" />
+        <ASP:Button visible="false" class="btn btn-danger" id="btnDelete" text="삭제하기" onClick="btnDelete_Click" runat="server" />
         <ASP:Button margin-left="auto" class="btn btn-info" id="btnRecommend" text="추천하기" onclick="btnRecommend_Click" runat="server" />
     </td>
   </tr>
 
-  <tr>
-    <td>
-    
-    </td>
-  </tr>
 </table>
-  
 </center>
-
-
 
 <!---------------- 댓글 목록 ------------------->
 <center>
-<table border-top="3px solid #dee2e6">
+<table class="table" border-top="3px solid #dee2e6">
   <tr>
     <td colspan="2" align="center">
       <ASP:Label id="lblCommentCount" runat="server" />
@@ -287,14 +252,14 @@
 
   <ASP:Repeater id="rptComment" runat="server">
   <ItemTemplate>
-    <tr height="80">
-      <th class="table-success" style="padding:0 0 0 10" width="231.81">
+    <tr>
+      <th class="table-success" width="167px">
         <%# Eval("user_name") %>
         <br>
         <font size="1"> <%# Eval("regdate") %> </font>
       </td>
       
-      <td class="table-light" width="675.46">
+      <td class="table-default">
         <font style="word-wrap:break-word; white-space: pre-line; table-layout: fixed;"> <%# Eval("content") %> </font>
       </td>
     </tr>
@@ -307,14 +272,14 @@
 
 <!--------------- 댓글쓰기 -------------------->
   <br>
-  <table id="tblCommentWrite" runat="server">
+  <table class="table" id="tblCommentWrite" runat="server">
   <tr>
-    <th class="table-info" width="231.81" style="padding:0 0 0 10">
+    <th class="table-info" width="167px">
       <ASP:Label id="lblWriter" runat="server" />
     </th>
 
-      <td width="675.46">
-      <ASP:TextBox class="form-control" id="txtComment" textmode="multiline" width="675.46" height="200" runat="server" />
+      <td>
+      <ASP:TextBox class="form-control2" id="txtComment" textmode="multiline" height="250" runat="server" />
       </td>
   </tr>
   <tr>

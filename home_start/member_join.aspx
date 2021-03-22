@@ -148,9 +148,6 @@ void btnJoin_Click(object sender, EventArgs e)
     lblJoinResult.ForeColor = System.Drawing.Color.Blue;
     lblJoinResult.Text = "회원가입이 완료되었습니다.";
 
-    //dg1.DataSource = DB.ExecuteQueryDataTable("Select * from //member");
-    //dg1.DataBind();
-
     // 로그인 완료 얼럿창
     string alert_str = "<script language=JavaScript> alert('회원가입이 완료되었습니다.');" +"</"+ "script>";
     ClientScript.RegisterStartupScript(typeof(Page), "alert", alert_str);
@@ -185,9 +182,30 @@ void btnGotoLogin_Click(object sender, EventArgs e)
 {
   Response.Redirect("member_login.aspx");
 }
+
+void txtIDChanged(object sender, EventArgs e)
+{
+  hdnCheckID.Value = "";
+}
+
+void txtPassCheckChanged(object sender, EventArgs e)
+{
+  if(txtPassCheck.Text==txtPass.Text){
+    lblPassCheckResult.ForeColor = System.Drawing.Color.Green;
+    lblPassCheckResult.Text = "비밀번호가 확인되었습니다.";
+    hdnCheckPass.Value = "1";
+    Response.Write(hdnCheckPass.Value);
+  }
+  else if(txtPassCheck.Text == "") lblPassCheckResult.Text ="";
+  else
+  {
+    lblPassCheckResult.ForeColor = System.Drawing.Color.Red;
+    lblPassCheckResult.Text = "비밀번호가 일치하지않습니다.";
+    hdnCheckPass.Value = "";
+  }
+}
+
 </script>
-
-
 
 <INCLUDE:TOP runat="server" />
 <!-- ----------------------------------여기서부터 내용 ---------->
@@ -205,18 +223,22 @@ void btnGotoLogin_Click(object sender, EventArgs e)
 <table class = table-member>
   <tr>
     <td width="150"> 회원아이디 </td>
-    <td width="260" >  <ASP:TextBox class="form-control" id="txtID" runat="server" /> </td>
+    <td width="260" >  <ASP:TextBox class="form-control" id="txtID" runat="server" OnTextChanged="txtIDChanged" AutoPostBack="false" /> </td>
     <td> <ASP:Button class="btn btn-danger" id="btnCheck" runat="server" text="중복체크!" OnClick="btnCheck_Click"/>
     <ASP:Label id="lblCheckResult" runat="server"/> </td>
   </tr>
   <tr>
     <td>  비밀번호  </td>
-    <td> <ASP:TextBox class="form-control" id="txtPass" textmode="password" runat="server" /> </td>
+    <td> <ASP:TextBox class="form-control" id="txtPass" textmode="password" runat="server" 
+          OnTextChanged="txtPassCheckChanged" AutoPostBack="false" /> 
+    </td>
     <td width=400> </td>
   </tr>
   <tr>
     <td>  비밀번호 확인 </td>
-    <td> <ASP:TextBox class="form-control" id="txtPassCheck" textmode="password" runat="server" /> </td>
+    <td> <ASP:TextBox class="form-control" id="txtPassCheck" textmode="password" runat="server" 
+    OnTextChanged="txtPassCheckChanged" AutoPostBack="false"/> 
+    </td>
     <td> <ASP:Button class="btn btn-success" id="btnPassCheck" runat="server" text="비밀번호 체크" OnClick="btnPassCheck_Click"/>
       <ASP:Label id="lblPassCheckResult" runat="server"/> </td>
   </tr>
@@ -226,10 +248,10 @@ void btnGotoLogin_Click(object sender, EventArgs e)
   </tr>
   <tr>
     <td>  직책  </td>
-    <td> <ASP:DropDownList class="form-control" id="DropDownList1" runat="server"> 
+    <td> 
+    <ASP:DropDownList class="form-control" id="DropDownList1" runat="server"> 
       <asp:ListItem Value="Manger">운영자</asp:ListItem>
       <asp:ListItem Value="PD">개발자</asp:ListItem>
-      <asp:ListItem Value="teacher">학교관계자</asp:ListItem>
     </asp:DropDownList>
     </td>                
   </tr>

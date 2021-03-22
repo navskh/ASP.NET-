@@ -19,10 +19,9 @@ namespace Study
     }
 
     // 게시판 글쓰기
-    public void Write( string category, string user_id, string user_name, string title, string content, string upload_file)
+    public void Write( string category, string user_id, string user_name, string title, string StudyType, string content, string upload_file)
     {
-      string query = String.Format("INSERT INTO board (category, user_id, user_name, title, content, file_attach) VALUES('{0}', '{1}', '{2}', '{3}', '{4}', '{5}')", 
-              category, user_id, user_name, title, content, upload_file);
+      string query = String.Format("INSERT INTO board (category, user_id, user_name, title, StudyType, content, file_attach) VALUES('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}')", category, user_id, user_name, title, StudyType, content, upload_file);
       
       DB.ExecuteQuery(query);
     }
@@ -133,8 +132,16 @@ namespace Study
 
     public DataTable CommentList(int board_id)
     {
-      string query = "SELECT * FROM board_comment WHERE board_id=" + board_id + " ORDER BY comment_id";
+      //string query = "SELECT * FROM board_comment WHERE board_id=" + board_id + " ORDER BY comment_id";
+      string query = "SELECT comment_id, board_id, board_comment.user_id, user_name, content, board_comment.regdate, member.user_type FROM board_comment INNER JOIN member ON member.user_id = board_comment.user_id WHERE board_id = " + board_id + " ORDER BY comment_id";
       return DB.ExecuteQueryDataTable(query);   
+    }
+
+    public int CommentAmount(int board_id)
+    {
+      string query = "SELECT COUNT(*) FROM board_comment WHERE board_id = " + board_id;
+
+      return (int)DB.ExecuteQueryResult(query);
     }
 
     public void ReadUp(string category, int number)
@@ -169,10 +176,10 @@ namespace Study
       DB.ExecuteQuery(query);
     }
 
-    public void Modify(int number, string title, string content, string upload_file)
+    public void Modify(int number, string title, string StudyType, string content, string upload_file)
     {
-      string query = String.Format("UPDATE board SET title='{0}', content='{1}', file_attach='{2}' WHERE board_id={3}", 
-      title, content, upload_file, number);
+      string query = String.Format("UPDATE board SET title='{0}', content='{1}', file_attach='{2}', StudyType='{3}' WHERE board_id={4}", 
+      title, content, upload_file, StudyType, number);
       DB.ExecuteQuery(query);
     }
 
@@ -248,10 +255,10 @@ namespace Study
       // 문자열 결합으로 이어나감.
       string page_str = "";
 
-      // 이전 페이지
+      // 이전 페이지로 이동하는 탭
+      // 1페이지가 아니면 무조건 이동 가능
       if(!now_page.Equals(1))
       {
-        // 1페이지가 아니면 무조건 이동 가능
         page_str += String.Format("<a class='text-success' href='{0}?{1}={2}&{3}'>◀이전</a>",
           HttpContext.Current.Request.ServerVariables["SCRIPT_NAME"],
           page_val_str,
@@ -263,13 +270,13 @@ namespace Study
           // 이동불가 : 링크 없음
           page_str += "◁이전";
       }
-      // 구분자는 무조건 넣어주고
+      // 구분자
       page_str += "|";
 
       // 다음페이지
       if(!now_page.Equals(total_page))
       {
-        // 끝 페이지가 아니면 무조건 이동가능
+        // 끝 페이지가 아니면 이동가능
         page_str += String.Format("<a class='text-success' href='{0}?{1}={2}&{3}'>다음▶</a>",
           HttpContext.Current.Request.ServerVariables["SCRIPT_NAME"],
           page_val_str,
@@ -283,87 +290,112 @@ namespace Study
 
       return page_str;
     }
+
     public string PageGen2(int page, int totalpage, string strFileName, string strLinkString, string strLinkName, int blockcount)
     {
 
-    string tmp = "";
-    string LINK_STR = strFileName + "?" + strLinkString + "&" + strLinkName + "=#PG#";
+      string tmp = "";
+      // LINK 정보 : 예) board_list.aspx?c=pims&stype=&svalue=&page=4
+      string LINK_STR = strFileName + "?" + strLinkString + "&" + strLinkName + "=#PG#";
+      
+      // 총 페이지 수로 전체 블록갯수를 구함
+      int TOTAL_BLOCK = totalpage / blockcount;
+      if (totalpage % blockcount != 0)
+      TOTAL_BLOCK++;
+      // 현재의 페이지 번호로 지금 위치한 블록을 구함
+      int NOW_BLOCK = page / blockcount;
+      if (page % blockcount != 0)
+      NOW_BLOCK++;
 
-    // 총 페이지 수로 전체 블록갯수를 구함
-    int TOTAL_BLOCK = totalpage / blockcount;
-    if (totalpage % blockcount != 0)
-    TOTAL_BLOCK++;
-    // 현재의 페이지 번호로 지금 위치한 블록을 구함
-    int NOW_BLOCK = page / blockcount;
-    if (page % blockcount != 0)
-    NOW_BLOCK++;
+      
 
-    
-
-   // 첫 페이지 이동링크
-    if (page != 1)
-    tmp += String.Format("<li class='page-item'><a href='{0}' class='page-link'><<</a></li>", LINK_STR.Replace("#PG#", "1"));
-    else
-    {
-      tmp += String.Format("<li class='page-item disabled'><a href='{0}' class='page-link'><<</a></li>", LINK_STR.Replace("#PG#", "1"));
-    }
-
-    // 첫 블럭은 [이전n]이 없음 링크도 없음
-    // if (NOW_BLOCK == 1)
-    // tmp += String.Format("[이전 {0}개]", blockcount);
-    // // 두번째 블럭은 [이전n]에 링크
-    // // 공식: 현재 블럭에서 앞으로 두칸 앞 블럭수에서 블럭단위를 곱해주고 +1 을 해주면 이전블럭의 첫 페이지가 구해짐
-    // else
-    // tmp += String.Format("<li class='page-item'><a href='{0}' class='page-link'>[이전 {1}개]</a></li>",
-    //   LINK_STR.Replace("#PG#", ((NOW_BLOCK-2)*blockcount+1).ToString()  ),
-    //   blockcount);
-
-    for (int i=1; i <= blockcount; i++)
-    {
-      int START_NUMBER = (NOW_BLOCK-1)*blockcount;
-      // 숫자가 현재페이지와 같으면 그냥 링크없이 빨간색 진하게 표시
-      if (START_NUMBER + i == page)
-      {
-        tmp += String.Format(" <li class='page-item active'><a class='page-link' href=#>{0}</a></li> ", page);
-      }
-      // 다르면 링크가능
+    // 첫 페이지 이동링크
+      if (page != 1)
+      tmp += String.Format("<li class='page-item'><a href='{0}' class='page-link'><<</a></li>", LINK_STR.Replace("#PG#", "1"));
       else
       {
-        tmp += String.Format("<li class='page-item'><a href='{0}' class='page-link'>{1}</a></li>",
-            LINK_STR.Replace("#PG#", (START_NUMBER+i).ToString()),
-            ((NOW_BLOCK-1)*blockcount + i ));
+        tmp += String.Format("<li class='page-item disabled'><a href='{0}' class='page-link'><<</a></li>", LINK_STR.Replace("#PG#", "1"));
       }
-      // 숫자가 계속 돌다가 전체페이지에 다다르면 현재의 for()를 빠져나옴
-      if (START_NUMBER + i == totalpage)
-      break;
+
+      // 첫 블럭은 [이전n]이 없음 링크도 없음
+      // if (NOW_BLOCK == 1)
+      // tmp += String.Format("[이전 {0}개]", blockcount);
+      // // 두번째 블럭은 [이전n]에 링크
+      // // 공식: 현재 블럭에서 앞으로 두칸 앞 블럭수에서 블럭단위를 곱해주고 +1 을 해주면 이전블럭의 첫 페이지가 구해짐
+      // else
+      // tmp += String.Format("<li class='page-item'><a href='{0}' class='page-link'>[이전 {1}개]</a></li>",
+      //   LINK_STR.Replace("#PG#", ((NOW_BLOCK-2)*blockcount+1).ToString()  ),
+      //   blockcount);
+
+      for (int i=1; i <= blockcount; i++)
+      {
+        int START_NUMBER = (NOW_BLOCK-1)*blockcount;
+        // 숫자가 현재페이지와 같으면 진하게 표시
+        if (START_NUMBER + i == page)
+        {
+          tmp += String.Format(" <li class='page-item active'><a class='page-link' href=#>{0}</a></li> ", page);
+        }
+        // 다르면 링크가능
+        else
+        {
+          tmp += String.Format("<li class='page-item'><a href='{0}' class='page-link'>{1}</a></li>",
+              LINK_STR.Replace("#PG#", (START_NUMBER+i).ToString()),
+              ((NOW_BLOCK-1)*blockcount + i ));
+        }
+        // 숫자가 계속 돌다가 전체페이지에 다다르면 현재의 for()를 빠져나옴
+        if (START_NUMBER + i == totalpage)
+        break;
+      }
+
+
+      // 다음 블럭은 현재의 블럭과 총 블럭이 같지 않을 때 표시
+      // if (NOW_BLOCK == TOTAL_BLOCK)
+      //   tmp += String.Format(" .. [다음 {0}개] ", blockcount);
+      // else
+      //   tmp += String.Format(" .. <a href='{0}'>[다음 {1}개]</a> ",
+      //     LINK_STR.Replace("#PG#", ((NOW_BLOCK*blockcount)+1).ToString()  ),
+      //     blockcount);
+      // 마지막 페이지 이동링크
+      if (page != totalpage)
+        tmp += String.Format(" <li class='page-item'> <a class='page-link' href='{0}'>>></a> </li>",
+              LINK_STR.Replace("#PG#", totalpage.ToString()),
+              totalpage);
+      else
+      {
+          tmp += String.Format(" <li class='page-item disabled'> <a class='page-link' href='{0}'>>></a> </li>",
+              LINK_STR.Replace("#PG#", totalpage.ToString()),
+              totalpage);
+      }
+      
+
+      // 만든 페이징 리턴
+      return tmp;
     }
-
-
-    // 다음 블럭은 현재의 블럭과 총 블럭이 같지 않을 때 표시
-    // if (NOW_BLOCK == TOTAL_BLOCK)
-    //   tmp += String.Format(" .. [다음 {0}개] ", blockcount);
-    // else
-    //   tmp += String.Format(" .. <a href='{0}'>[다음 {1}개]</a> ",
-    //     LINK_STR.Replace("#PG#", ((NOW_BLOCK*blockcount)+1).ToString()  ),
-    //     blockcount);
-    // 마지막 페이지 이동링크
-    if (page != totalpage)
-      tmp += String.Format(" <li class='page-item'> <a class='page-link' href='{0}'>>></a> </li>",
-            LINK_STR.Replace("#PG#", totalpage.ToString()),
-            totalpage);
-    else
+  
+    public float WhatisCount(string condition)
     {
-        tmp += String.Format(" <li class='page-item disabled'> <a class='page-link' href='{0}'>>></a> </li>",
-            LINK_STR.Replace("#PG#", totalpage.ToString()),
-            totalpage);
-    }
-    
+      string query = "";
+      if(condition == "all")
+      query= "select count(*) from pims_board where regdate > DATEADD(D, -7, GETDATE());";
+      else
+      {
+        query= "select count(*) from pims_board where regdate > DATEADD(D, -7, GETDATE()) and condition='" + condition + "';";
+      }
+      float COUNT = (int)DB.ExecuteQueryResult(query);
+      return COUNT;
+    } 
 
-    // 만든 페이징 리턴
-    return tmp;
-    }
-
-
+    public float WhatisYourCount(string condition, string yourName)
+    {
+      string query = "";
+      if(condition == "all")
+      query= "select count(*) from pims_board where regdate > DATEADD(D, -7, GETDATE()) and DeveloperID='"+yourName+"';";
+      else
+      query= "select count(*) from pims_board where regdate > DATEADD(D, -7, GETDATE()) and condition='" + condition + "' and DeveloperID='"+yourName + "';";
+      float COUNT = (int)DB.ExecuteQueryResult(query);
+      return COUNT;
+    } 
   }
 
+  
 }
