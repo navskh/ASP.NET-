@@ -8,19 +8,19 @@
 
 void Page_Load(){
 
-  Board BOARD_LIB = new Board();
-  Database DB = new Database();
-
   if(!String.IsNullOrEmpty((string)Session["login_id"])) btnGotoLogin.Visible = false;
   else btnGotoLogin.Visible = true;
 
-  float TOTAL_COUNT = BOARD_LIB.WhatisCount("all");
+  Board BOARD_LIB = new Board();
+  Database DB = new Database();
+
+  // 요청상태 별로 글 수를 가져옴.
+  float TOTAL_COUNT = BOARD_LIB.WhㄴatisCount("all");
   float READY_COUNT = BOARD_LIB.WhatisCount("접수");
   float PROGRESS_COUNT = BOARD_LIB.WhatisCount("처리중");
   float CANNOT_COUNT = BOARD_LIB.WhatisCount("불가");
   float DELAY_COUNT = BOARD_LIB.WhatisCount("지연");
   float FINISH_COUNT = BOARD_LIB.WhatisCount("완료");
-
 
   string PROGRESS_PERCENT = String.Format("{0:0.0}%",((PROGRESS_COUNT )/ TOTAL_COUNT)*  100);
   ltlProgressPercent.Text = PercentDisplay(PROGRESS_PERCENT, "secondary");
@@ -58,7 +58,6 @@ void Page_Load(){
     ltlDelayPercent2.Text = PercentDisplay(DELAY_PERCENT, "warning");
     WORK_PERCENT = String.Format("{0:0.0}%",100-((PROGRESS_COUNT) /TOTAL_COUNT) * 100);
 
-    
     if(TOTAL_COUNT == 0)
     {
       ltlMessage2.Text = "<h1 style='margin-left: 30;'> 본인 요청 진행 상황 </h1> <h4 style='margin-left:30;'> 현재 진행하는 요청 내역이 없습니다. </h4>";
@@ -66,7 +65,6 @@ void Page_Load(){
     }
     else
     ltlMessage2.Text = "<h1 style='margin-left: 30;'> 본인 요청 진행 상황 </h1> <h4 style='margin-left:30;'> 현재 진행률은 " + WORK_PERCENT + "입니다. </h4>";
-
   }
   else
   {

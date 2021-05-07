@@ -33,13 +33,6 @@
     // 검색 추가
     if(!String.IsNullOrEmpty(STYPE) && !String.IsNullOrEmpty(SVALUE)) IsSearch = true;
     
-    //리턴 : DataTable
-    DataTable dtList = null;
-    
-    // 페이징을 위한 소스
-    if(!String.IsNullOrEmpty(Request["page"]))
-      NOW_PAGE = Int32.Parse(Request["page"]);
-
     // 검색 추가 : 검색중이라면 검색결과 메서드 호출
     if(IsSearch)
     {      
@@ -53,10 +46,12 @@
       }
     }
 
-    // 포토 게시판의 경우 한페이지에 12개씩 들억가게 만들었음.
-    //if(CATEGORY_ID.ToLower().Equals("photo"))
-    //  BOARD_LIB.PAGE_SIZE = 12;
+    // 페이징을 위한 소스
+    if(!String.IsNullOrEmpty(Request["page"]))
+      NOW_PAGE = Int32.Parse(Request["page"]);
 
+    //리턴 : DataTable
+    DataTable dtList = null;
 
     // 리스트 가져오기
     if(CATEGORY_ID.ToLower().Equals("pims")) 
@@ -65,7 +60,7 @@
       TOTAL_COUNT = BOARD_LIB.ListCount_PIMS(CATEGORY_ID, STYPE, SVALUE); // 전체 카운트 확인 SELECT COUNT 사용
     }
   
-    else // 일단 사용 안함.
+    else // 일단 사용 안함. (카테고리 아이디별로 나누면 사용)
     {
       dtList = BOARD_LIB.List(CATEGORY_ID, NOW_PAGE, STYPE, SVALUE);
       TOTAL_COUNT = BOARD_LIB.ListCount(CATEGORY_ID, STYPE, SVALUE);
@@ -82,10 +77,10 @@
         PAGE_COUNT++;
 
       
-      PAGE_BLOCK = PAGE_COUNT/10;
-      if(PAGE_COUNT%10 != 0) PAGE_BLOCK++;
-      NOW_BLOCK = NOW_PAGE/10;
-      if(NOW_PAGE%10 != 0) NOW_BLOCK++;
+      PAGE_BLOCK = PAGE_COUNT / 10;
+      if(PAGE_COUNT % 10 != 0) PAGE_BLOCK++;
+      NOW_BLOCK = NOW_PAGE / 10;
+      if(NOW_PAGE % 10 != 0) NOW_BLOCK++;
 
       lblTotalPageInfo.Text = String.Format("총 {0} 페이지가 있습니다.", PAGE_COUNT);
     }
@@ -103,7 +98,7 @@
         String.Format("c={0}&stype={1}&svalue={2}", CATEGORY_ID, STYPE, SVALUE));
     }
 
-    // 열칸씩 생기는 페이지 이동 탭
+    // 끝으로 이동하는 페이지 이동 탭
     if(TOTAL_COUNT != 0)
     {
       lblPageMove2.Text = BOARD_LIB.PageGen2(NOW_PAGE,PAGE_COUNT,"board_list.aspx",
@@ -115,13 +110,13 @@
       lblPageMove2.Visible = false;
     }
 
+    // 블록이동하는 버튼
     if(NOW_BLOCK == 1)
     {
       if(PAGE_BLOCK == 1) {
         lblPageMove3.Visible = false;
         lblTotalPageInfo.Visible = false;
       }
-
       else{
         lblPageMove3.Text = String.Format("<td> <a class=page-link2-disabled>이전 10페이지 이동 </a> </td> " +
         "<td> <a class=page-link2 href=board_list.aspx?c=pims&stype={0}&svalue={1}&page={2}>다음 10페이지 이동 </a> </td>"
@@ -355,7 +350,7 @@
 </ASP:PlaceHolder>
 <!-- PIMS 업무 요청 영역 끝-->
 
-<!-- 교육 내용 영역 시작 (추후 수정 예정)-->
+<!-- 공부 내용 영역 시작 (추후 수정 예정)-->
 <ASP:PlaceHolder id="phBoard2" runat="server">
   <center>
 
@@ -410,7 +405,7 @@
   </ASP:Repeater>
   </table>
 </ASP:PlaceHolder>
-<!-- 교육 내용 영역 끝 -->
+<!-- 공부 내용 영역 끝 -->
 
 <!-- 검색 필드 제목, 내용 필터를 선택한 후 검색-->
 <center>

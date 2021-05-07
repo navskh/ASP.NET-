@@ -102,7 +102,6 @@ void btnJoin_Click(object sender, EventArgs e)
   string Telnum = txtTelnum.Text.Trim();
   string user_type = DropDownList1.SelectedItem.Value;
 
-  // 역시 통과했다고 미리 가정.
   bool bChecked = true;
   string check_message = "";
 
@@ -209,9 +208,6 @@ void txtPassCheckChanged(object sender, EventArgs e)
 
 <INCLUDE:TOP runat="server" />
 <!-- ----------------------------------여기서부터 내용 ---------->
-
-
-
 <div id="content">
 <center>
 <h1>어서오세요! 회원가입을 진행해주세요</h1>
@@ -261,7 +257,6 @@ void txtPassCheckChanged(object sender, EventArgs e)
   </tr>
 
 </table>  
-
 
   <br>
   <ASP:Button class="btn btn-info" id="btnJoin" runat="server" text="회원가입 완료" OnClick="btnJoin_Click" />

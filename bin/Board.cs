@@ -26,17 +26,6 @@ namespace Study
       DB.ExecuteQuery(query);
     }
 
-    public void Write_PIMS( string category, string ServiceName, string ServiceID, string Developer, string Due_Date,
-    string user_id, string user_name, string title, string type, string content, string upload_file)
-    {
-      string query = String.Format("INSERT INTO pims_board (category, ServiceName, UnivServiceID, DeveloperID, Due_Date," +
-      "user_id, user_name, title, Board_Type, content, file_attach, condition) "+ 
-      "VALUES('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}', '{8}', '{9}', '{10}', '접수')", 
-      category, ServiceName, ServiceID, Developer, Due_Date, user_id, user_name, title, type, content, upload_file);
-
-      DB.ExecuteQuery(query);
-    }
-
     // 게시판 목록
     public DataTable List(string category)
     {
@@ -73,46 +62,13 @@ namespace Study
       return DB.ExecuteQueryDataTable(query.ToString());
       
     }
-
-    public DataTable List_PIMS()
-    {
-      return DB.ExecuteQueryDataTable("SELECT * FROM pims_board ORDER BY board_id desc");
-    }
-
-    public DataTable List_PIMS(int now_page, string search_target, string search_word)
-    {
-      int start_id, end_id;
-
-      start_id = (now_page-1) * PAGE_SIZE;
-      end_id = (now_page * PAGE_SIZE) + 1;
-
-      System.Text.StringBuilder query = new System.Text.StringBuilder();
-      query.Append("SELECT * FROM");
-      query.Append(" ( ");
-      query.Append("SELECT ROW_NUMBER() OVER(ORDER BY board_id DESC) AS row_num, * FROM pims_board tmp");
-      query.Append(" WHERE category='pims'");
-      if(!String.IsNullOrEmpty(search_target) && !String.IsNullOrEmpty(search_word))
-        query.Append(" AND " + search_target + " LIKE '%" + search_word + "%' ");
-      query.Append(" ) ");
-      query.Append(" AS BOARD_NUMBERED ");
-      query.Append(String.Format(" WHERE row_num>{0} AND row_num<{1}",start_id, end_id));
-
-      return DB.ExecuteQueryDataTable(query.ToString());
-      
-    }
-
-
+    
     public DataTable Read(string category, int number)
     {
       string query = String.Format("SELECT * FROM board WHERE category='{0}' AND board_id={1}", category, number);
       return DB.ExecuteQueryDataTable(query);         
     }
 
-    public DataTable Read_PIMS(string category, int number)
-    {
-      string query = String.Format("SELECT * FROM pims_board WHERE category='{0}' AND board_id={1}", category, number);
-      return DB.ExecuteQueryDataTable(query);         
-    }
 
     public DataTable Read_User(string user_id)
     {
@@ -293,7 +249,6 @@ namespace Study
 
     public string PageGen2(int page, int totalpage, string strFileName, string strLinkString, string strLinkName, int blockcount)
     {
-
       string tmp = "";
       // LINK 정보 : 예) board_list.aspx?c=pims&stype=&svalue=&page=4
       string LINK_STR = strFileName + "?" + strLinkString + "&" + strLinkName + "=#PG#";
@@ -302,12 +257,11 @@ namespace Study
       int TOTAL_BLOCK = totalpage / blockcount;
       if (totalpage % blockcount != 0)
       TOTAL_BLOCK++;
+
       // 현재의 페이지 번호로 지금 위치한 블록을 구함
       int NOW_BLOCK = page / blockcount;
       if (page % blockcount != 0)
       NOW_BLOCK++;
-
-      
 
     // 첫 페이지 이동링크
       if (page != 1)
@@ -316,16 +270,6 @@ namespace Study
       {
         tmp += String.Format("<li class='page-item disabled'><a href='{0}' class='page-link'><<</a></li>", LINK_STR.Replace("#PG#", "1"));
       }
-
-      // 첫 블럭은 [이전n]이 없음 링크도 없음
-      // if (NOW_BLOCK == 1)
-      // tmp += String.Format("[이전 {0}개]", blockcount);
-      // // 두번째 블럭은 [이전n]에 링크
-      // // 공식: 현재 블럭에서 앞으로 두칸 앞 블럭수에서 블럭단위를 곱해주고 +1 을 해주면 이전블럭의 첫 페이지가 구해짐
-      // else
-      // tmp += String.Format("<li class='page-item'><a href='{0}' class='page-link'>[이전 {1}개]</a></li>",
-      //   LINK_STR.Replace("#PG#", ((NOW_BLOCK-2)*blockcount+1).ToString()  ),
-      //   blockcount);
 
       for (int i=1; i <= blockcount; i++)
       {
@@ -347,15 +291,6 @@ namespace Study
         break;
       }
 
-
-      // 다음 블럭은 현재의 블럭과 총 블럭이 같지 않을 때 표시
-      // if (NOW_BLOCK == TOTAL_BLOCK)
-      //   tmp += String.Format(" .. [다음 {0}개] ", blockcount);
-      // else
-      //   tmp += String.Format(" .. <a href='{0}'>[다음 {1}개]</a> ",
-      //     LINK_STR.Replace("#PG#", ((NOW_BLOCK*blockcount)+1).ToString()  ),
-      //     blockcount);
-      // 마지막 페이지 이동링크
       if (page != totalpage)
         tmp += String.Format(" <li class='page-item'> <a class='page-link' href='{0}'>>></a> </li>",
               LINK_STR.Replace("#PG#", totalpage.ToString()),
@@ -376,26 +311,70 @@ namespace Study
     {
       string query = "";
       if(condition == "all")
-      query= "select count(*) from pims_board where regdate > DATEADD(D, -7, GETDATE());";
+      //query= "select count(*) from pims_board where regdate > DATEADD(D, -7, GETDATE());";
+      query= "select count(*) from pims_boardWrite;";
       else
       {
-        query= "select count(*) from pims_board where regdate > DATEADD(D, -7, GETDATE()) and condition='" + condition + "';";
+        query= "select count(*) from pims_board where condition='" + condition + "';";
+        //query= "select count(*) from pims_board where regdate > DATEADD(D, -7, GETDATE()) and condition='" + condition + "';";
       }
       float COUNT = (int)DB.ExecuteQueryResult(query);
       return COUNT;
     } 
 
+    public void Write_PIMS( string category, string ServiceName, string ServiceID, string Developer, string Due_Date,
+    string user_id, string user_name, string title, string type, string content, string upload_file)
+    {
+      string query = String.Format("INSERT INTO pims_board (category, ServiceName, UnivServiceID, DeveloperID, Due_Date," +
+      "user_id, user_name, title, Board_Type, content, file_attach, condition) "+ 
+      "VALUES('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}', '{8}', '{9}', '{10}', '접수')", 
+      category, ServiceName, ServiceID, Developer, Due_Date, user_id, user_name, title, type, content, upload_file);
+
+      DB.ExecuteQuery(query);
+    }
+    public DataTable List_PIMS()
+    {
+      return DB.ExecuteQueryDataTable("SELECT * FROM pims_board ORDER BY board_id desc");
+    }
+
+    public DataTable List_PIMS(int now_page, string search_target, string search_word)
+    {
+      int start_id, end_id;
+
+      start_id = (now_page-1) * PAGE_SIZE; // PAGE_SIZE : 10 고정값
+      end_id = (now_page * PAGE_SIZE) + 1;
+
+      System.Text.StringBuilder query = new System.Text.StringBuilder();
+      query.Append("SELECT * FROM");
+      query.Append(" ( ");
+      query.Append("SELECT ROW_NUMBER() OVER(ORDER BY board_id DESC) AS row_num, * FROM pims_board tmp");
+      query.Append(" WHERE category='pims'");
+      if(!String.IsNullOrEmpty(search_target) && !String.IsNullOrEmpty(search_word))
+        query.Append(" AND " + search_target + " LIKE '%" + search_word + "%' ");
+      query.Append(" ) ");
+      query.Append(" AS BOARD_NUMBERED ");
+      query.Append(String.Format(" WHERE row_num>{0} AND row_num<{1}",start_id, end_id));
+
+      return DB.ExecuteQueryDataTable(query.ToString());
+      
+    }
+    public DataTable Read_PIMS(string category, int number)
+    {
+      string query = String.Format("SELECT * FROM pims_board WHERE category='{0}' AND board_id={1}", category, number);
+      return DB.ExecuteQueryDataTable(query);         
+    }
     public float WhatisYourCount(string condition, string yourName)
     {
       string query = "";
       if(condition == "all")
-      query= "select count(*) from pims_board where regdate > DATEADD(D, -7, GETDATE()) and DeveloperID='"+yourName+"';";
+      //query= "select count(*) from pims_board where regdate > DATEADD(D, -7, GETDATE()) and DeveloperID='"+yourName+"';";
+      query= "select count(*) from pims_board where DeveloperID='"+yourName+"';";
       else
-      query= "select count(*) from pims_board where regdate > DATEADD(D, -7, GETDATE()) and condition='" + condition + "' and DeveloperID='"+yourName + "';";
+      //query= "select count(*) from pims_board where regdate > DATEADD(D, -7, GETDATE()) and condition='" + condition + "' and DeveloperID='"+yourName + "';";
+      query= "select count(*) from pims_board where condition='" + condition + "' and DeveloperID='"+yourName + "';";
       float COUNT = (int)DB.ExecuteQueryResult(query);
       return COUNT;
     } 
   }
-
   
 }

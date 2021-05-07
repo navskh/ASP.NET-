@@ -8,7 +8,6 @@ void Page_Load(){
   
 }
 void btnLogin_Click(object sender, EventArgs e){
-  lblLoginResult.Text = " 버튼이 눌렸습니다.";
   loginproc();
 }
 

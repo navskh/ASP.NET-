@@ -81,16 +81,11 @@ void btnWrite_Click(object sender, EventArgs e) // 수정완료 버튼 클릭 �
   
   // 빈 값을 체크. || 는 OR 이다. ('~또는'라고 해석하자)
   // title이 빈 문자열이거나 content 가 빈 문자열이라면..
-  if (title == "" || 
-  content.Equals("")||
-  ServiceID.Equals("")||
-  ServiceName.Equals("")
-  )
+  if (title == "" || content.Equals("") || ServiceID.Equals("") || ServiceName.Equals(""))
   {
     IsChecked = false;
     message = "서비스 명, 서비스 ID, 제목, 내용 중에 빈칸이 올 수 없습니다.";
   }
-
 
   // 앞에서 패스하였다면.. 이제 업로드 체크 후 저장
   if (IsChecked)
@@ -136,20 +131,20 @@ void btnWrite_Click(object sender, EventArgs e) // 수정완료 버튼 클릭 �
       title, type, content, upload_file);
 
       // 이후 글보기로 바로 이동
-    Response.Redirect(
+      Response.Redirect(
       "pims_board_view.aspx?c=" + Request["c"] + "&n=" + Request["n"] + "&page=" + Request["page"]
       + "&stype=" + Request["stype"] + "&svalue=" + Request["svalue"]
       );
     }
     else{
-    //Pims 글쓰기 (INSERT)
-    BOARD_LIB.Write_PIMS(category, ServiceName, ServiceID, "미정", Due_Date,
-    user_id, user_name, title, type, content, upload_file);
+      //Pims 글쓰기 (INSERT)
+      BOARD_LIB.Write_PIMS(category, ServiceName, ServiceID, "미정", Due_Date,
+      user_id, user_name, title, type, content, upload_file);
 
-    MailSend();
+      MailSend();
 
-    // 이후 리스트로 바로 이동 ('c' 값은 계속 유지)
-    Response.Redirect("board_list.aspx?c=" + Request["c"]);
+      // 이후 리스트로 바로 이동 ('c' 값은 계속 유지)
+      Response.Redirect("board_list.aspx?c=" + Request["c"]);
     }
   }
 

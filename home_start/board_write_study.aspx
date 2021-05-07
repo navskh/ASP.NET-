@@ -142,7 +142,7 @@ void btnWrite_Click(object sender, EventArgs e) // 수정완료 or 글쓰기 버
       );
     }
     else{
-    //Pims 글쓰기 (INSERT)
+    //공부내용 글쓰기 (INSERT)
     BOARD_LIB.Write(category, user_id, user_name, title, StudyType, content, upload_file);
 
     // 이후 리스트로 바로 이동 ('c' 값은 계속 유지)

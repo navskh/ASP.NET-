@@ -27,7 +27,7 @@
         NOW_PAGE = Int32.Parse(Request["page"]);
       }
       //로그인 체크   
-      // 로그인이 안되어 있으면 쓰기 영역 없애기
+      // 로그인이 안되어 있으면 댓글 쓰기 영역 없애기
       if (Session["login_id"] == null)
         tblCommentWrite.Visible = false;
       //로그인 되었으면 작성자 Label 넣기
@@ -57,25 +57,27 @@
         DataRow user = dtUser.Rows[0];
         user_type = (string)user["user_type"];
       }
-      
+      /*
       if(user_type == "Manger")
       {
         lblcondition.Visible = true;
         lblcondition.Text = (string)row["condition"];
         contentCondition.Visible = false;
       }
+
       else if(user_type == "PD")
       {
         lblcondition.Visible = false;
         //lblcondition.Text = (string)row["condition"];
         contentCondition.Visible = true;
       }
+
       else
       {
         lblcondition.Visible = true;
         lblcondition.Text = (string)row["condition"];
         contentCondition.Visible = false;
-      }
+      }*/
 
       lblServiceID.Text = (string)row["UnivServiceID"];
       lblServiceName.Text = (string)row["ServiceName"];
@@ -229,6 +231,12 @@
 
   void condition_change(object sender, EventArgs e)
   {
+    this.contentCondition.Items[0].Enabled = false;
+    this.contentCondition.Items[1].Enabled = true;
+    this.contentCondition.Items[2].Enabled = true;
+    this.contentCondition.Items[3].Enabled = true;
+    this.contentCondition.Items[4].Enabled = true;
+
     if(this.contentCondition.SelectedValue == "inprogress")
     { 
       Board BOARD_LIB = new Board();
@@ -238,23 +246,12 @@
       lblDeveloper.Text = (string)Session["login_nick"];
       BOARD_LIB.Update_condition(lblDeveloper.Text, "처리중", BOARD_ID);
 
-      this.contentCondition.Items[0].Enabled = false;
-      this.contentCondition.Items[1].Enabled = true;
-      this.contentCondition.Items[2].Enabled = true;
-      this.contentCondition.Items[3].Enabled = true;
-      this.contentCondition.Items[4].Enabled = true;
     }
     else if(this.contentCondition.SelectedValue == "finish")
     {
       Board BOARD_LIB = new Board();
       BOARD_LIB.Update_condition(lblDeveloper.Text, "완료", BOARD_ID);
-
-      this.contentCondition.Items[0].Enabled = false;
-      this.contentCondition.Items[1].Enabled = true;
-      this.contentCondition.Items[2].Enabled = true;
-      this.contentCondition.Items[3].Enabled = true;
-      this.contentCondition.Items[4].Enabled = true;
-
+      
       this.contentCondition.SelectedIndex = 2;
     }
 
@@ -263,12 +260,6 @@
       Board BOARD_LIB = new Board();
       BOARD_LIB.Update_condition(lblDeveloper.Text, "불가", BOARD_ID);
 
-      this.contentCondition.Items[0].Enabled = false;
-      this.contentCondition.Items[1].Enabled = true;
-      this.contentCondition.Items[2].Enabled = true;
-      this.contentCondition.Items[3].Enabled = true;
-      this.contentCondition.Items[4].Enabled = true;
-
       this.contentCondition.SelectedIndex = 4;
     }
     
@@ -276,12 +267,6 @@
     {
       Board BOARD_LIB = new Board();
       BOARD_LIB.Update_condition(lblDeveloper.Text, "지연", BOARD_ID);
-
-      this.contentCondition.Items[0].Enabled = false;
-      this.contentCondition.Items[1].Enabled = true;
-      this.contentCondition.Items[2].Enabled = true;
-      this.contentCondition.Items[3].Enabled = true;
-      this.contentCondition.Items[4].Enabled = true;
 
       this.contentCondition.SelectedIndex = 3;
     }
